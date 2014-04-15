@@ -303,18 +303,18 @@ flgs2
 *	r1	is used to load the value of the first operand if it is in memory
 *	r2	is used to load the value of the second operand if it is in memory
 
-	r0 = 'R0'; r1 = 'R1'; r2 = 'R2'
-	xl = 'XL'; xr = 'XR'; xs = 'XS'; xt = 'XL'
-	wa = 'WA'; wb = 'WB'; wc = 'WC'
-	ia = 'IA'; cp = 'CP'; ra = 'RA'
+	r0 = 'r0'; r1 = 'r1'; r2 = 'r2'
+	xl = 'xl'; xr = 'xr'; xs = 'xs'; xt = 'xl'
+	wa = 'wa'; wb = 'wb'; wc = 'wc'
+	ia = 'ia'; cp = 'cp'; ra = 'ra'
 * user rc for error handling (this is memory location in x32 version)
-	r1 = 'R1'
-	r2 = 'R2'
+	r1 = 'r1'
+	r2 = 'r2'
 
-	arg.r1 = minarg(8, 'R1')
-	arg.r2 = minarg(8, 'R2')
-	arg.ia = minarg(8, 'IA')
-	ra.arg = minarg(8, 'RA')
+	arg.r1 = minarg(8, 'r1')
+	arg.r2 = minarg(8, 'r2')
+	arg.ia = minarg(8, 'iA')
+	ra.arg = minarg(8, 'rA')
 
 	r0 = 'r0'; r1 = 'r1'; r2 = 'r2'
 	xl = 'xl'; xr = 'xr'; xs = 'xs'; xt = 'xl'
