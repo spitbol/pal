@@ -2,5 +2,5 @@ package main
 
 
 func main() {
-	interp()
+	_ = Startup()
 }

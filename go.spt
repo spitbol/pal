@@ -81,13 +81,9 @@
 	nos     = '0123456789'
 	tab	= char(9)
 
-	define('lower(s)')
-	define('upper(s)')
-
 *  default the parameter string if none present
 *
         arch = (differ(host(0)) host(0), "i32")
-	arch = lower(arch)
 	
 	output = 'target architecture ' arch
 *        output = ident(fileprefix) "filename (.lex) required" :s(end)
@@ -467,13 +463,12 @@ genlab	genlab = 'labl' lpad(genlabels = genlabels + 1,3,'0') :(return)
 -stitl genopl(gopl,gopc,gop1,gop2,gop3)
 *  generate operation with label
 genopl	
-	gopc = lower(gopc)
 	opsused[gopc] = opsused[gopc] + 1
 	putstmt(gopl,gopc,gop1,gop2,gop3)	:(return)
 
 -stitl genop(gopc,gop1,gop2,gop3)
 *  generate operation with no label
-genop   genopl(,lower(gopc),gop1,gop2,gop3)            
+genop   genopl(,gopc,gop1,gop2,gop3)            
 * output = 'genop ' gopc ',' gop1 ',' gop2 ',' gop3
 						:(return)
 
@@ -651,11 +646,6 @@ ifreg
 	eq(i.type(iarg),8) ident(i.text(iarg),'ia')	:s(return)
 	ge(i.type(iarg),7) le(i.type(iarg),8) 	:f(freturn)s(return)
 
--stitl lower(s) -  convert argument to upper case
-lower
-	lower = replace(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-.			  'abcdefghijklmnopqrstuvwxyz')	:(return)
-
 -stltl move(dst,src)dtype,stype,stext,dtext
 * generate code for move instruction
 move
@@ -820,7 +810,7 @@ put1
 *
 *
 readline 
-	readline = lower(infile)              	:f(readline.1)
+	readline = infile	              	:f(readline.1)
 	nlines  = nlines + 1
 	ident( readline )			:s(readline)
 readline.0
@@ -863,11 +853,6 @@ tin02   str     (break('[') $ index len(1) break(']') $ val len(1)) =
 	lastval = val
 	tblini[index] = val			:(tin02)
 -stitl generators
-
--stitl upper(s) - convert string to upper case
-upper
-	upper = replace(s,'abcdefghijklmnopqrstuvwxyz',
-.			  'ABCDEFGHIJKLMNOPQRSTUVWXYZ')	:(return)
 
 * 1 - Basic instruction set
 

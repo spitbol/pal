@@ -57,9 +57,6 @@
 	p.real	= span(nos) '.' (span(nos) | null) (p.exp | null) rpos(0)
 	tab	= char(9)
 
-*  lower converts to upper case
-	define('lower(s)')
-
 *  argform classifies arguments
 	define('argform(arg)')
 
@@ -376,7 +373,6 @@
 *  default the parameter string if none present
 *
 	arch = (differ(host(0)) host(0), "x32")
-	arch = lower(arch)
 	parm = "s"
 	filenamc = parm '.cnd'
 	filenami = parm '.min'
@@ -968,8 +964,4 @@ g.prc
 	ident(t = prctab[label]) error('missing inp')
 	differ(t,op1) error('inconsistent inp/prc')
 	prctab[label] =				:(dsgen)
-* convert argument to upper case
-lower
-	lower = replace(s,'abcdefghijklmnopqrstuvwxyz',
-.			  'abcdefghijklmnopqrstuvwxyz')	:(return)
 end

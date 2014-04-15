@@ -32,7 +32,7 @@
 *      .ccmc                 define to include syscm function
 .def   .ccmk                 define to include compare keyword
 *      .ceng                 define to include engine features
-.def   .cepp                 define if entry points have odd parity
+*      .cepp                 define if entry points have odd parity
 .def   .cera                 define to include sysea function
 .def   .cevb                 define to fix eval bug
 .def   .cexp                 define to have spitbol pop sysex arguments
