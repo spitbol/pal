@@ -1,1 +1,6 @@
-/home/daveshields/h/spitbol/spitbol.go
+package main
+
+
+func main() {
+	interp()
+}

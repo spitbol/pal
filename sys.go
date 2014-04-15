@@ -1,4 +1,4 @@
-package minimal
+package main
 
 import (
 	"bufio"
