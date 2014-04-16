@@ -18,7 +18,8 @@ func main() {
 		fmt.Println("argument file required")
 		return
 	}
-	ifileName := flag.Arg(0)
+	ifileName = flag.Arg(0)
+	fmt.Println("input file name",ifileName)
 	if itrace || strace {
 		otrace = true
 	}
