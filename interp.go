@@ -124,10 +124,13 @@ func interp() {
 //		op, opName[op], regName[dst], reg[dst], 
 //		regName[src], reg[src], off)
 		ip++
+/*
 		fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v\n",
 			reg[r1],reg[r2],reg[wa],reg[wb],reg[wc],reg[xl],reg[xr],reg[xs])	
+*/
 		switch op {
-
+		case stmt:
+			fmt.Printf("  %v\n",stmt_text[off])
 		case mov:
 			reg[dst] = reg[src]
 		case brn:

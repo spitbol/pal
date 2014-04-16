@@ -826,6 +826,7 @@ fiop	differ(condvar)				:s(synerr)
 *
 other	eq( level )				:s(rl00)
 	eq( processrec[result(top),mode(top)] )	:s(rdline)f(rl00)
+
 -stitl	tblini(str)pos,cnt,index,val,lastval
 *  this routine is called to initialize a table from a string of
 *  index/value pairs.

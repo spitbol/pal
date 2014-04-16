@@ -104,6 +104,8 @@
 *
 *  data structures
 *
+	stmt_text = table(15000)
+	
 	data('minarg(i.type,i.text)')
 
 	sectnow = 0
@@ -154,7 +156,29 @@
 	define('putlab(label)')
 	define('putline(stmt)')
 	define('report(num,text)')
+	define('setini(str)elmt')
 	define('tblini(str)pos,cnt,index,val,lastval')
+
+*  	is_exec is set giving the executable minimal statements
+	is_exec = setini(
+.	'flc add adi adr anb aov atn '
+.	'bod bev bct beq bge bgt '
+.	'bhi ble blo blt bne bnz brn '
+.	'bri bsw bsw btw bze ceq '
+.	'chk chp cmb cmc cne cos csc ctb '
+.	'ctw cvd cvm dac dbc dca dcv '
+.	'dvi dvr ejc erb etx exi exp '
+.	'ica icp icv ieq ige igt ile ilt ine ino '
+.	'iov itr jsr lch lct lcp '
+.	'lcw ldi ldr lei lnf lsh lsx mcb '
+.	'mfi mli mlr mnz mov mti '
+.	'mvc mvw mwb ngi ngr nzb '
+.	'orb plc prc prc psc req '
+.	'rge rgt rle rlt rmi rne rno '
+.	'rov rsh rsx rti rtn sbi '
+.	'sbr sch scp sec sin sqr ssl sss '
+.	'sti str sub trc '
+.	'wtb xob zer zgb zrb ')
 
 *  putstmt writes a target statement
 *
@@ -228,7 +252,7 @@
 +       'jsr jsrerr lch lct lcp lcw ldi ldr lei loadi loadcfp lnf lsh lsx mcb mfi mli mlr '
 +       'mnz mov mti mvc mvw mwb ngi eti ngr nzb orb plc ppm prc psc '
 +       'req rge rgt rle rlt rmi rne rno rov rsh rsx rti rtn sbi sbr '
-+       'sch scp sin sqr ssl sss sti str sub sys tan trc wtb xob zer '
++       'sch scp sin sqr ssl sss sti stmt str sub sys tan trc wtb xob zer '
 +	'ent inr lea move load loadi push pushi pushr pop popr realop store zrb '
 
 *	don't trace mvc as doing so causes just 'end' to fail. sort out later. (ds 01/09/13)
@@ -243,17 +267,13 @@ opcodes.2
 * create a map that can be used to enter the values later.
 	drctab = table(50)
 
-* initialize osint procs
 	osiprocs = 
 .	'sysax sysbs sysbx syscm sysdc sysdm sysdt sysea sysef sysej sysem sysen sysep sysex '
 .	'sysfc sysgc syshs sysid sysif sysil sysin sysio sysld sysmm sysmx sysou syspi syspl '
 .	'syspp syspr sysrd sysri sysrw sysst systt systm sysul sysxi '
-	is_osint = table(50)
-	str = osiprocs
-osiprocs.1
-	str break(' ') . name ' ' =			:f(osiprocs.2)
-	is_osint[name] = 1			:(osiprocs.1)
-osiprocs.2
+
+* initialize osint procs
+	is_osint = setini(osiprocs)
 
 -stitl main program
 *  here follows the driver code for the "main" program.
@@ -410,6 +430,13 @@ opnext.1
 	tcomment = comregs(incomment) '} ' incode ' ' i.text(i1) ' '
 .		i.text(i2) ' ' i.text(i3)
 	argerrs = 0
+	ident(in_executable)			:s(opnext.2)
+	ident(is_exec[incode])			:s(opnext.2)
+*	putline(" executable statement " incomment)
+*	putline(" executable statement " thisline)
+	stmt_text[stmtn = stmtn + 1] = thisline
+	genop('stmt',,,stmtn)
+opnext.2
 						:($('g.' incode))
 *  here if bad opcode
 ds01	error('bad op-code')			:(opnext)
@@ -820,6 +847,13 @@ putline
 	outfile = stmt
 	ntarget	= ntarget + 1
 	noutlines = noutlines + 1		:(return)
+
+-stitl  setini(str)elmt
+*  this routine builds a set as a map from a string of elements
+setini	setini = table(100)
+setini.1
+	str break(' ') . elmt ' ' =		:f(return)
+	setini[elmt] = 1			:(setini.1)
 
 -stitl tblini(str)
 *  this routine is called to initialize a table from a string of
@@ -1280,6 +1314,8 @@ g.sec.4
 *  here at start of program section.  if any n type procedures,
 *  put out entry-word block declaration at end of working storage
 g.sec.5
+	in_executable = 1
+
 *  emit code to indicate in code section
 *  get direction set to up.
 *TODO	genop('prc_: times ' prc.count1 ' dd 0') putline('// sec05' )
@@ -1432,6 +1468,14 @@ g.end.prc_names
 g.end.prc_names.1
 	putline('}')
 
+	putline('var stmt_text = map[uint32]string {')
+	i = 0
+g.end.stmts
+	gt(i = i + 1, stmtn)			:s(g.end.stmts.1)
+	str = stmt_text[i]			:f(g.end.stmts.1)
+	putline(tab i tab ':' tab '"' str '",')	:(g.end.stmts)
+g.end.stmts.1
+	putline('}')
 * Close files and issue summary report
 
 	endfile(1)
