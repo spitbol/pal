@@ -75,6 +75,7 @@
 *
 *  useful constants
 *
+	digits = '012356789'
 	letters = 'abcdefghijklmnopqrstuvwxyz'
 	ucase  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 	lcase   = letters
@@ -138,7 +139,7 @@
 	define('genbop(stmt)')
 	define('putconst(value)')
         define('genlab()')
-	define('genop(gopc,gop1,gop2,gop3)')
+	define('genop(gopc,gop1,gop2,gop3,gcom)')
 	define('get1()')
 	define('get2()')
 	define('getarg(iarg,imem)l1,l2,t1,t2')
@@ -158,6 +159,7 @@
 	define('report(num,text)')
 	define('setini(str)elmt')
 	define('tblini(str)pos,cnt,index,val,lastval')
+	define('unlex(text)ulab,uop,u1,u2,u3,ucom,inum')
 
 *  	is_exec is set giving the executable minimal statements
 	is_exec = setini(
@@ -434,10 +436,14 @@ opnext.1
 	ident(is_exec[incode])			:s(opnext.2)
 *	putline(" executable statement " incomment)
 *	putline(" executable statement " thisline)
-	stmt_text[stmtn = stmtn + 1] = thisline
-	genop('stmt',,,stmtn)
+*	output = 'unlex :' thisline ':'
+	untext = unlex(thisline)
+	stmt_text[stmtn = stmtn + 1] = untext
+	genop('stmt',,,stmtn,untext)
+
 opnext.2
 						:($('g.' incode))
+
 *  here if bad opcode
 ds01	error('bad op-code')			:(opnext)
 
@@ -486,11 +492,11 @@ putconst
 *  generate unique labels for use in generated code
 genlab	genlab = 'labl' lpad(genlabels = genlabels + 1,3,'0') :(return)
 
--stitl genop(gopc,gop1,gop2,gop3)
+-stitl genop(gopc,gop1,gop2,gop3,gcom)
 *  generate operation 
 genop
 	opsused[gopc] = opsused[gopc] + 1
-	putstmt(gopc,gop1,gop2,gop3)	:(return)
+	putstmt(gopc,gop1,gop2,gop3,gcom)	:(return)
 -stitl get1()
 * return argument if it is a register, or else load the argument
 * value into r1
@@ -796,7 +802,9 @@ putstmt
 .	tab rpad(opcode,8) 
 .	(differ(op1) '| ' rpad(op1,6)  ' << dst_ ',)
 .	(differ(op2) '| ' rpad(op2,6)  ' << src_ ',)
-.	(differ(op3) '| ' rpad(op3,6)  ' << off_ ',) ','
+.	(differ(op3) '| ' rpad(op3,6)  ' << off_ ',) 
+.	','
+.	(differ(comment) tab comment,)
 	op = op1 = op2 = op3 =
 	ident(list.comments)			:s(putstmt.1)
 	ident(incomment)			:s(putstmt.1)
@@ -878,6 +886,19 @@ tin02   str     (break('[') $ index len(1) break(']') $ val len(1)) =
 	val     = ident(val,lastval) lastval
 	lastval = val
 	tblini[index] = val			:(tin02)
+	
+-stltl unlex(text)ulab,uop,u1,u2,u3,ucom,unum
+unlex
+	unlex = text
+	unlex  '{' break('{') . ulab '{' break('{') . uop
+.		'{' break('{') . u1 '{' break('{') . u2
+.		'{' break('{') . u3 '{' break('{') . ucom
+.		'{' rem . unum 
+		u1 span(digits) ',' = 
+		u2 span(digits) ',' = 
+		u3 span(digits) ',' = 
+	unlex =  '//' (ident(ulab) tab, ulab tab)  uop ' ' u1 ' ' u2 ' ' u3 ' ' ucom 
+						:(return)
 -stitl generators
 
 * 1 - Basic instruction set

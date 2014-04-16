@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"fmt"
+//	"fmt"
 	//	"io"
 	"os"
 	"time"
@@ -337,7 +337,6 @@ func syspr() uint32 {
 
 var sysrds int
 func sysrd() uint32 {
-	fmt.Println("enter sysrd")
 	sysrds++
 	scblk := mem[reg[xr]:]
 /*
@@ -347,17 +346,20 @@ func sysrd() uint32 {
 */
 	switch sysrds {
 	case 1:
-		goblk := minString("t.spt")
+	// here to open the input file and return its name
+		goblk := minString(ifileName)
 		for i:=0;i<int(goblk[1]);i++ {
 			scblk[i] = goblk[i]
 		}
 		reg[wc] = goblk[1]
 		return 1
-	default: // signal end of file, no more input
+	default: 
+// signal end of file, no more input
 		scblk := mem[reg[xr]:]
 		scblk[1] = 0
 		reg[wc] = 0
-		return 1
+// force end of program, same as swcinp in c-version
+		return 999
 	}
 	return 1
 }
@@ -397,7 +399,6 @@ func sysxi() uint32 {
 
 func syscall(ea uint32) uint32 {
 
-	fmt.Println("SYSCALL ", ea)
 	switch ea {
 
 	case sysax_:

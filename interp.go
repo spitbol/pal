@@ -97,6 +97,7 @@ func interp() {
 	var d1 float64
 
 	ip = start
+run:
 	for {
 		//		fmt.Println("ip",ip)
 		if ip < s_aaa || ip > s_yyy {
@@ -117,20 +118,24 @@ func interp() {
 		dst = inst >> dst_ & dst_m
 		src = inst >> src_ & src_m
 		off = inst >> off_ & off_m
-		fmt.Printf(" %v %v %v %v %v %v\n", ip,
-		op, opName[op], regName[dst], regName[src], off)
+		if itrace {
+			fmt.Printf(" %v %v %v %v %v %v\n", ip,
+			op, opName[op], regName[dst], regName[src], off)
 
+		}
 //		fmt.Printf(" %v %v %v %v=%v %v=%v %v\n", ip,
 //		op, opName[op], regName[dst], reg[dst], 
 //		regName[src], reg[src], off)
 		ip++
-/*
+		if itrace {
 		fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v\n",
 			reg[r1],reg[r2],reg[wa],reg[wb],reg[wc],reg[xl],reg[xr],reg[xs])	
-*/
+		}
 		switch op {
 		case stmt:
+		if strace || itrace {
 			fmt.Printf("  %v\n",stmt_text[off])
+		}
 		case mov:
 			reg[dst] = reg[src]
 		case brn:
@@ -154,7 +159,9 @@ func interp() {
 			prcstack[off] = mem[reg[xs]]
 			reg[xs]++
 		case exi:
+			if itrace {
 			fmt.Println("PROC:EXI  ", reg[xs], mem[reg[xs]], ip)
+			}
 			// dst is procedure identifier  if 'n' type procedure, 0 otherwise.
 			// off is exit number
 			if off >= 100 {
@@ -224,7 +231,9 @@ func interp() {
 		case lct:
 			reg[dst] = reg[src]
 		case bct:
+			if itrace {
 			fmt.Println("BCT", dst, off)
+			}
 			reg[dst]--
 			if reg[dst] > 0 {
 				ip = off
@@ -497,15 +506,24 @@ func interp() {
 		case move:
 			reg[dst] = reg[src]
 		case call:
+			if itrace {
 			fmt.Println("PROC:CALL ", off, prc_names[off], reg[xs],mem[reg[xs]], ip)
+			}
 			reg[xs]--
 			mem[reg[xs]] = ip
 			ip = off
 		case sys:
-			fmt.Printf("SYSCALL %v %v %v\n", off, sysName[off],reg[r1])
+			if otrace { 
+			fmt.Printf("OSINT CALL %v\n", sysName[off])
+			}	
 			reg[r1] = syscall(off)
+			if otrace { 
+			fmt.Printf("OSINT RETN %v %v\n", sysName[off],reg[r1])
+			}	
+		
 			if reg[r1] == 999 {
-				break // end execution
+			fmt.Println("SYS exit 999")
+				break run // end execution
 			}
 /*
 		case decv:
@@ -515,7 +533,9 @@ func interp() {
 			reg[ia] = uint32(-int1 + 0x30)
 */
 		case jsrerr:
+			if itrace {
 			fmt.Println("PROC:JSRE ", ip, reg[r1],off)
+			}
 			if reg[r1] == 0 {
 				ip = ip + off  // skip around exi/ppm's
 			} else {
@@ -523,7 +543,9 @@ func interp() {
 			}
 		case load:
 			reg[dst] = mem[reg[src]+off]
-//			fmt.Println("  load ",regName[dst], "<-",mem[reg[src]+off], reg[src]+off)
+			if itrace {
+			fmt.Println("  load ",regName[dst], "<-",mem[reg[src]+off], reg[src]+off)
+			}
 		case loadcfp:
 			reg[dst] = 2147483647
 		case loadi:
@@ -549,7 +571,9 @@ func interp() {
 			panic("realop not implemented")
 		case store:
 			mem[reg[src]+off] = reg[dst]
-//			fmt.Println("  store ",regName[dst], reg[dst], "->",reg[src]+off)
+			if itrace {
+			fmt.Println("  store ",regName[dst], reg[dst], "->",reg[src]+off)
+			}
 		default:
 			fmt.Println("unknown opcode ", op)
 			panic("unknown opcode")
@@ -564,7 +588,7 @@ func interp() {
 // wa=initial stack pointer
 // wb=wc=ia=ra=cp=0
 
-func Startup() int {
+func startup() int {
 	//	var memMinimum int = len(program) + 3 * (maxreclen + 2) + stackLength
 	for i := 0; i < len(program); i++ {
 		mem[i] = program[i]
