@@ -511,7 +511,6 @@ run:
 			}
 
 			if reg[r1] == 999 {
-				fmt.Println("SYS exit 999")
 				break run // end execution
 			}
 			/*

@@ -169,7 +169,7 @@
 .	'bri bsw bsw btw bze ceq '
 .	'chk chp cmb cmc cne cos csc ctb '
 .	'ctw cvd cvm dac dbc dca dcv '
-.	'dvi dvr ejc erb etx exi exp '
+.	'dvi dvr erb etx exi exp '
 .	'ica icp icv ieq ige igt ile ilt ine ino '
 .	'iov itr jsr lch lct lcp '
 .	'lcw ldi ldr lei lnf lsh lsx mcb '
@@ -439,6 +439,8 @@ opnext.1
 *	output = 'unlex :' thisline ':'
 	untext = unlex(thisline)
 	stmt_text[stmtn = stmtn + 1] = untext
+*	only emit 'stmt' to trace executable statements
+*	cannot emit 'stmt' opcode when in midst of compiling 'bsw' statement
 	genop('stmt',,,stmtn,untext)
 
 opnext.2
@@ -918,6 +920,7 @@ g.iff
 	putconst(getarg(i2))			:(opnext)
 
 g.esw						:(opnext)
+	
 
 g.ent
 *	note that emitted constant must come before the label declaration

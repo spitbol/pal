@@ -113,6 +113,9 @@ func setscblk(b uint32, str string) {
 }
 
 func sysem() uint32 {
+	if otrace {
+	fmt.Println("sysem ", reg[wa])
+	}
 	if int(reg[wa]) > len(error_messages) { // return null string if error number out of range
 		reg[xr] = uint32(scblk0)
 		return 0
