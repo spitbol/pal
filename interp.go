@@ -78,10 +78,11 @@ const (
 )
 
 var (
-	reg      [16]uint32
-	mem      [100000]uint32
 	ip       uint32
+	mem      [100000]uint32
+	reg      [16]uint32
 	stackEnd uint32
+	memLast	 uint32 // index of last allocated memory word
 )
 
 func interp() {
@@ -97,15 +98,23 @@ func interp() {
 	var d1 float64
 
 	ip = start
+/*
+			fmt.Printf(" startup r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
+				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
+				 reg[cp],int32(reg[ia]))
+	fmt.Printf("start interp mem len %v  ip %v r0 %v\n",len(mem),ip,reg[r0])
+	fmt.Printf("s_aaa %v s_yyy %v\n",s_aaa,s_yyy)
+*/
 run:
 	for {
-		if ip < s_aaa || ip > s_yyy {
-			fmt.Println("ip out of range ", ip)
-			return
-		}
 		if reg[r0] != 0 {
 			fmt.Println("r0 not zero", reg[r0], ip)
 			panic("r0 not zero")
+		}
+		if ip < s_aaa || ip > s_yyy {
+			fmt.Println("ip out of range ", ip)
+			fmt.Println(" aaa yyy",s_aaa,s_yyy)
+			return
 		}
 		inst = mem[ip]
 		instn++
@@ -582,35 +591,23 @@ func startup() int {
 		mem[i] = program[i]
 		//		fmt.Printf("mem %v %x\n",i,mem[i])
 	}
-	scblk0 = 20000
-	scblk1 = 22000
-	scblk2 = 24000
-	reg[xs] = 25000
-	stackEnd = 24500
-	reg[xr] = 30000
-	reg[xl] = 50000
-	reg[wa] = start
-	reg[wb] = 0
-	reg[wc] = 0
-	reg[wa] = 25000 - 1
-	interp()
-	/*
-		last := len(program)
-		scblk0 = last
-		last += maxreclen + 2
-		scblk1 = last
-		last += maxreclen + 2
-		scblk2 = last
-		last += maxreclen + 2
-		// allocate stack
-		stackEnd = uint32(last)
-		last += stackLength
-		stackStart := uint32(last)
+		memLast =  uint32(len(program)) + 10
+		// scblk is just four words, sufficient to hold null string
+		scblk0 = memLast
+		scblk1 = memLast + 4
+		scblk2 = scblk1 + maxreclen + 1
+		memLast += maxreclen + 1
+		stackEnd = uint32(memLast)
+		memLast += stackLength
+		stackStart := uint32(memLast)
+		memLast += 10
+		reg[xl] = memLast // start data area
+	// allocate 10000 words for initial data area
+		memLast += 10000
+		reg[xr] = memLast  // end data area
 		reg[xs] = stackStart
-		memStart := last + 1
-		//memEnd := memStart + 1
-		// allocate work areas
-	*/
+		reg[wa] = reg[xs] - 1
+	interp()
 	return 0
 }
 

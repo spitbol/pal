@@ -266,6 +266,7 @@ func sysio() uint32 {
 	if fcb == nil {
 		return 1
 	}
+
 	if !fcb.open {
 		if fcb.output {
 			file, err = os.Create(fcb.name)
@@ -295,8 +296,19 @@ func sysld() uint32 {
 }
 
 func sysmm() uint32 {
-	// no memory expansion for now
-	reg[xr] = 0
+	old := int(memLast)
+	new := old
+	if new >= len(mem) - 1 {
+		// no memory available for expansion
+		reg[xr] = 0
+	} else {
+		new = old + 1000
+		if new >= len(mem) - 1 {
+			new = len(mem) - 1
+		}
+		reg[xr] = uint32(new - old)
+		memLast = uint32(new)
+	}
 	return 0
 }
 
