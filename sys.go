@@ -75,15 +75,15 @@ func sysdt() uint32 {
 	t := time.Now()
 	// TODO: Need to initialize scblk1 and scblk2 to blocks im mem[]
 	s := t.Format(time.RFC822)
-	reg[xl] = minString(scblk0,maxreclen,s)
+	reg[xl] = minString(scblk0, maxreclen, s)
 	return 0
 }
 
 func sysea() uint32 {
 	fmt.Printf("sysea wa %v wb %v wc %v xr %v %v\n",
-		reg[wa],reg[wb],reg[wc],reg[xr],reg[xl])
+		reg[wa], reg[wb], reg[wc], reg[xr], reg[xl])
 	// no action for now
-	_ = printscb(xl,0)
+	_ = printscb(xl, 0)
 	return 0
 }
 
@@ -113,13 +113,13 @@ func setscblk(b uint32, str string) {
 }
 
 func sysem() uint32 {
-	fmt.Println("sysem number",reg[wa])
+	fmt.Println("sysem number", reg[wa])
 	if int(reg[wa]) > len(error_messages) { // return null string if error number out of range
 		reg[xr] = uint32(scblk0)
 		return 0
 	}
 	message := error_messages[reg[xr]]
-	reg[xr] = minString(scblk1,maxreclen,message)
+	reg[xr] = minString(scblk1, maxreclen, message)
 	printscb(xr, 0)
 	return 0
 }
@@ -230,8 +230,8 @@ func syshs() uint32 {
 }
 
 func sysid() uint32 {
-	reg[xr] = minString(scblk0,maxreclen," dave")
-	reg[xl] = minString(scblk1,maxreclen,"shields")
+	reg[xr] = minString(scblk0, maxreclen, " dave")
+	reg[xl] = minString(scblk1, maxreclen, "shields")
 	return 0
 }
 
@@ -324,7 +324,7 @@ func syspl() uint32 {
 }
 
 func syspp() uint32 {
-	reg[wa] = maxreclen
+	reg[wa] = 100
 	reg[wb] = 60
 	reg[wc] = 0
 	return 0
@@ -335,9 +335,9 @@ func syspr() uint32 {
 		os.Stdout.WriteString("\n")
 		return 0
 	}
-	printscb(xr,reg[wa])
+	printscb(xr, reg[wa])
 	return 0
-//	return writeLine(fcb1, reg[xr])
+	//	return writeLine(fcb1, reg[xr])
 
 }
 
@@ -350,7 +350,7 @@ func sysrd() uint32 {
 	sysrds++
 	scblk := mem[reg[xr]:]
 	if otrace {
-		fmt.Println("sysrd xr",reg[xr])
+		fmt.Println("sysrd xr", reg[xr])
 	}
 	/*
 		scblk[1] = 0
@@ -367,27 +367,29 @@ func sysrd() uint32 {
 			return 999
 		}
 		scanner = bufio.NewScanner(ifile)
-		_ = minString(reg[xr],reg[wc], ifileName)
-		printscb(xr,reg[wc])
+		_ = minString(reg[xr], reg[wc], ifileName)
+		printscb(xr, reg[wc])
 		return 1
 	default:
 		// read next line from ifile, quit on EOF
 		scanned := scanner.Scan()
 		if scanned {
-		line := scanner.Text()
-		if otrace {
-			fmt.Println("sysrd read",line)
-		}
-		_ = minString(reg[xr],reg[wc],line)
-		reg[wc] = uint32(len(line))
-		printscb(xr,reg[wc])
-		return 0
+			line := scanner.Text()
+			if otrace {
+				fmt.Println("sysrd read", line)
+			}
+			_ = minString(reg[xr], reg[wc], line)
+			reg[wc] = uint32(len(line))
+			printscb(xr, reg[wc])
+			return 0
 		}
 		if err := scanner.Err(); err != nil {
-			fmt.Println(os.Stderr, "reading input:",err)
+			fmt.Println(os.Stderr, "reading input:", err)
 			scblk[1] = 0
 			reg[wc] = 0
 		}
+		// here at eof, indicate no END statement present, and quite
+		fmt.Println("No end statement found in input file")
 		return 999
 	}
 	return 999
@@ -461,6 +463,7 @@ func syscall(ea uint32) uint32 {
 		return sysej()
 
 	case sysem_:
+		fmt.Println("enter sysem ip ",ip)
 		return sysem()
 
 	case sysen_:
@@ -592,14 +595,14 @@ func minBytes(b []byte) []uint32 {
 }
 
 // make scblk from go string
-func minString(scblkid uint32, max uint32,  g string) uint32{
+func minString(scblkid uint32, max uint32, g string) uint32 {
 	s := mem[scblkid:]
 	n := len(g)
-	if n > int(max){
+	if n > int(max) {
 		n = maxreclen
 	}
 	s[1] = uint32(n)
-	for i := 0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		s[i+2] = uint32(g[i])
 	}
 	return scblkid
@@ -700,27 +703,26 @@ var sysName = map[uint32]string{
 	sysxi_: "sysxi",
 }
 
-func printscb(regno int,actual uint32) int{
+func printscb(regno int, actual uint32) int {
 	scblk := mem[reg[regno]:]
 	n := int(scblk[1])
 	if int(actual) > 0 && n > int(actual) {
 		n = int(actual)
 	}
-	buf := make([]byte,n)
-	for i := 0; i<n;i++ {
+	buf := make([]byte, n)
+	for i := 0; i < n; i++ {
 		buf[i] = byte(scblk[i+2])
-//		buf[i] = scb[i+2]
+		//		buf[i] = scb[i+2]
 	}
-	n,err := os.Stdout.Write(buf)
+	n, err := os.Stdout.Write(buf)
 	if err != nil {
 		fmt.Println("stdout error writing")
 		return 999
 	}
-	n,err = os.Stdout.WriteString("\n")
+	n, err = os.Stdout.WriteString("\n")
 	if err != nil {
 		fmt.Println("stdout error writing")
 		return 999
 	}
 	return 0
 }
-

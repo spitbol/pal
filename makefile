@@ -1,26 +1,11 @@
 # X32 SPITBOL makefile using gcc
 #
 
-ARCH?=x32
+ARCH?=i32
 CHARBITS=8
 DEBUG?=0
 EXECUTABLE=spitbol
 UNICODE?=0
-
-ifeq ($(ARCH),x32)
-ARCHDEF=-D ARCH_X32_8
-ELF=elf32
-endif
-ifeq ($(ARCH),x64)
-ARCHDEF=-D ARCH_X64
-ELF=elf64
-endif
-
-ifneq ($(UNICODE),0)
-CHARBITS=32
-ARCHDEF=-D ARCH_X32_32
-EXECUTABLE=uspitbol
-endif
 
 
 # SPITBOL Version:
@@ -122,21 +107,9 @@ OBJS=	$(AOBJS) $(COBJS) $(HOBJS) $(LOBJS) $(SYSOBJS) $(VOBJS) $(MOBJS) $(NAOBJS)
 
 # link spitbol with static linking
 spitbol: $(OBJS)
-ifeq ($(ARCH),x32)
-	$(CC) $(CFLAGS) $(OBJS) -static /usr/lib/i386-linux-gnu/libm.a -o$(EXECUTABLE) -Wl,-M,-Map,$(EXECUTABLE).map
-endif
-ifeq ($(ARCH),x64)
-	$(CC) $(CFLAGS) $(OBJS) -static /usr/lib/i386-linux-gnu/libm.a -ospitbol -Wl,-M,-Map,spitbol.map
-endif
 
 # link spitbol with dynamic linking
 spitbol-dynamic: $(OBJS)
-ifeq ($(ARCH),x32)
-	$(CC) $(CFLAGS) $(OBJS) /usr/lib/i386-linux-gnu/libm.a -ospitbol -Wl,-M,-Map,$(EXECUTABLE).map
-endif
-ifeq ($(ARCH),x64)
-	$(CC) $(CFLAGS) $(OBJS) /usr/lib/i386-linux-gnu/libm.a -ospitbol -Wl,-M,-Map,$(EXECUTABLE).map
-endif
 
 # Assembly language dependencies:
 err.o: err.s

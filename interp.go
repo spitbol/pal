@@ -26,19 +26,19 @@ const (
 	xt = xs
 )
 
-var regName  = map[uint32]string {
-	r0 : "r0",
-	r1 : "r1",
-	r2 : "r2",
-	wa : "wa",
-	wb : "wb",
-	wc : "wc",
-	xl : "xl",
-	xr : "xr",
-	xs : "xs",
-	ia : "ia",
-	ra : "ra",
-	cp : "cp",
+var regName = map[uint32]string{
+	r0: "r0",
+	r1: "r1",
+	r2: "r2",
+	wa: "wa",
+	wb: "wb",
+	wc: "wc",
+	xl: "xl",
+	xr: "xr",
+	xs: "xs",
+	ia: "ia",
+	ra: "ra",
+	cp: "cp",
 }
 
 /*
@@ -88,7 +88,7 @@ func interp() {
 	instn := 0
 	var long1, long2 int64
 	//	var int1,int2 int32
-	var int1,int2 int32
+	var int1, int2 int32
 	var prcstack [32]uint32
 	var inst, dst, src, off uint32
 	var overflow bool
@@ -99,19 +99,18 @@ func interp() {
 	ip = start
 run:
 	for {
-		//		fmt.Println("ip",ip)
 		if ip < s_aaa || ip > s_yyy {
 			fmt.Println("ip out of range ", ip)
 			return
 		}
 		if reg[r0] != 0 {
-			fmt.Println("r0 not zero",reg[r0],ip)
+			fmt.Println("r0 not zero", reg[r0], ip)
 			panic("r0 not zero")
 		}
 		inst = mem[ip]
 		instn++
 		if instn > 150000 {
-			fmt.Println("instruction limit exceeded",instn)
+			fmt.Println("instruction limit exceeded", instn)
 			return
 		}
 		op = inst & op_m
@@ -119,23 +118,23 @@ run:
 		src = inst >> src_ & src_m
 		off = inst >> off_ & off_m
 		if itrace {
+			fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v %v\n",
+				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs], reg[cp])
 			fmt.Printf(" %v %v %v %v %v %v\n", ip,
-			op, opName[op], regName[dst], regName[src], off)
+				op, opName[op], regName[dst], regName[src], off)
 
 		}
-//		fmt.Printf(" %v %v %v %v=%v %v=%v %v\n", ip,
-//		op, opName[op], regName[dst], reg[dst], 
-//		regName[src], reg[src], off)
+		//		fmt.Printf(" %v %v %v %v=%v %v=%v %v\n", ip,
+		//		op, opName[op], regName[dst], reg[dst],
+		//		regName[src], reg[src], off)
 		ip++
-		if itrace {
-		fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v\n",
-			reg[r1],reg[r2],reg[wa],reg[wb],reg[wc],reg[xl],reg[xr],reg[xs])	
-		}
 		switch op {
 		case stmt:
-		if strace || itrace {
-			fmt.Printf("  %v\n",stmt_text[off])
-		}
+			if strace {
+				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v %v\n",
+					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs], reg[cp])
+				fmt.Printf("  %v\n", stmt_text[off])
+			}
 		case mov:
 			reg[dst] = reg[src]
 		case brn:
@@ -148,7 +147,7 @@ run:
 				}
 			}
 			// when reach here, ip is pointing to first iff entry
-			ip = mem[ip + reg[dst]]
+			ip = mem[ip+reg[dst]]
 		case bri:
 			ip = reg[dst]
 		case lei:
@@ -160,12 +159,12 @@ run:
 			reg[xs]++
 		case exi:
 			if itrace {
-			fmt.Println("PROC:EXI  ", reg[xs], mem[reg[xs]], ip)
+				fmt.Println("PROC:EXI  ", reg[xs], mem[reg[xs]], ip)
 			}
 			// dst is procedure identifier  if 'n' type procedure, 0 otherwise.
 			// off is exit number
 			if off >= 100 {
-				ip = prcstack[off / 100]
+				ip = prcstack[off/100]
 				reg[r1] = off % 100
 			} else {
 				// pop return address from stack
@@ -173,7 +172,7 @@ run:
 				reg[xs]++
 				reg[r1] = off
 			}
-		case err,erb:
+		case err, erb:
 			reg[wa] = off
 			ip = error_
 		case icv:
@@ -231,9 +230,6 @@ run:
 		case lct:
 			reg[dst] = reg[src]
 		case bct:
-			if itrace {
-			fmt.Println("BCT", dst, off)
-			}
 			reg[dst]--
 			if reg[dst] > 0 {
 				ip = off
@@ -295,7 +291,7 @@ run:
 				overflow = true
 			} else {
 				overflow = false
-				int1,int2 = int32(reg[ia]),int32(reg[dst])
+				int1, int2 = int32(reg[ia]), int32(reg[dst])
 				int1 /= int2
 				reg[ia] = uint32(int1)
 			}
@@ -304,12 +300,12 @@ run:
 				overflow = true
 			} else {
 				overflow = false
-				int1,int2 = int32(reg[ia]),int32(reg[dst])
+				int1, int2 = int32(reg[ia]), int32(reg[dst])
 				int1 %= int2
 				reg[ia] = uint32(int1)
 			}
-//		case sti:
-//			reg[dst] = reg[ia]
+			//		case sti:
+			//			reg[dst] = reg[ia]
 		case ngi:
 			int1 = int32(reg[ia])
 			if int1 == math.MinInt32 {
@@ -412,34 +408,25 @@ run:
 		case psc:
 			reg[dst] = reg[dst] + reg[src] + 2
 		case cne:
-		// Current spitbol code only has 'cne', no instances of 'ceq'
-			s1 := mem[reg[xl]:]
-			s2 := mem[reg[xr]:]
-			n := int(reg[wa])
-			for i:=0;i<n;i++ {
-				if s1[i] != s2[i] {
-					ip = off
-					reg[xl],reg[xr] = 0,0
-					break
-				}
+			if reg[dst] != reg[src] {
+				ip = off
 			}
-			reg[xl],reg[xr] = 0,0
 		case cmc:
 			s1 := mem[reg[xl]:]
 			s2 := mem[reg[xr]:]
 			n := int(reg[wa])
-			for i:=0;i<n;i++ {
+			for i := 0; i < n; i++ {
 				if s1[i] < s2[i] {
 					ip = reg[r1]
-					reg[xl],reg[xr] = 0,0
+					reg[xl], reg[xr] = 0, 0
 					break
 				} else if s1[i] > s2[i] {
 					ip = reg[r2]
-					reg[xl],reg[xr] = 0,0
+					reg[xl], reg[xr] = 0, 0
 					break
 				}
 			}
-			reg[xl],reg[xr] = 0,0
+			reg[xl], reg[xr] = 0, 0
 		case trc:
 			panic("trc not implemented")
 		case flc:
@@ -451,9 +438,9 @@ run:
 		case xob:
 			reg[dst] ^= reg[src]
 		case rsh:
-			reg[dst] = reg[dst] >> reg[src]
+			reg[dst] = reg[dst] >> off
 		case lsh:
-			reg[dst] = reg[dst] << reg[src]
+			reg[dst] = reg[dst] << off
 		case nzb:
 			if reg[dst] != 0 {
 				ip = off
@@ -474,7 +461,7 @@ run:
 				ip = off
 			}
 			reg[ia] = uint32(int32(d1))
-		case ctb,ctw:
+		case ctb, ctw:
 			reg[dst] += off
 		case cvm:
 			long1 = int64(reg[ia])*10 - (int64(reg[wb]) - 0x30)
@@ -507,44 +494,44 @@ run:
 			reg[dst] = reg[src]
 		case call:
 			if itrace {
-			fmt.Println("PROC:CALL ", off, prc_names[off], reg[xs],mem[reg[xs]], ip)
+				fmt.Println("PROC:CALL ", off, prc_names[off], reg[xs], mem[reg[xs]], ip)
 			}
 			reg[xs]--
 			mem[reg[xs]] = ip
 			ip = off
 		case sys:
-			if otrace { 
-			fmt.Printf("OSINT CALL %v\n", sysName[off])
-			}	
+			if otrace {
+				fmt.Printf("OSINT CALL %v\n", sysName[off])
+			}
 			reg[r1] = syscall(off)
-			if otrace { 
-			fmt.Printf("OSINT RETN %v %v\n", sysName[off],reg[r1])
-			}	
-		
+			if otrace {
+				fmt.Printf("OSINT RETN %v %v\n", sysName[off], reg[r1])
+			}
+
 			if reg[r1] == 999 {
-			fmt.Println("SYS exit 999")
+				fmt.Println("SYS exit 999")
 				break run // end execution
 			}
-/*
-		case decv:
-			int1 = int32(reg[ia])
-			reg[ia] = uint32(reg[ia] / 10)
-			int1 = int1 % 10
-			reg[ia] = uint32(-int1 + 0x30)
-*/
+			/*
+				case decv:
+					int1 = int32(reg[ia])
+					reg[ia] = uint32(reg[ia] / 10)
+					int1 = int1 % 10
+					reg[ia] = uint32(-int1 + 0x30)
+			*/
 		case jsrerr:
 			if itrace {
-			fmt.Println("PROC:JSRE ", ip, reg[r1],off)
+				fmt.Println("PROC:JSRE ", ip, reg[r1], off)
 			}
 			if reg[r1] == 0 {
-				ip = ip + off  // skip around exi/ppm's
+				ip = ip + off // skip around exi/ppm's
 			} else {
 				ip = ip + reg[r1] - 1
 			}
 		case load:
 			reg[dst] = mem[reg[src]+off]
 			if itrace {
-			fmt.Println("  load ",regName[dst], "<-",mem[reg[src]+off], reg[src]+off)
+				fmt.Println("  load ", regName[dst], "<-", mem[reg[src]+off], reg[src]+off)
 			}
 		case loadcfp:
 			reg[dst] = 2147483647
@@ -572,7 +559,7 @@ run:
 		case store:
 			mem[reg[src]+off] = reg[dst]
 			if itrace {
-			fmt.Println("  store ",regName[dst], reg[dst], "->",reg[src]+off)
+				fmt.Println("  store ", regName[dst], reg[dst], "->", reg[src]+off)
 			}
 		default:
 			fmt.Println("unknown opcode ", op)
@@ -625,104 +612,105 @@ func startup() int {
 	*/
 	return 0
 }
-var opName = map[uint32]string {
-	add: "add",
-	adi: "adi",
-	adr: "adr",
-	anb: "anb",
-	aov: "aov",
-	bct: "bct",
-	beq: "beq",
-	bev: "bev",
-	bge: "bge",
-	bgt: "bgt",
-	bhi: "bhi",
-	ble: "ble",
-	blo: "blo",
-	blt: "blt",
-	bne: "bne",
-	bnz: "bnz",
-	bod: "bod",
-	bri: "bri",
-	brn: "brn",
-	bsw: "bsw",
-	bze: "bze",
-	call: "call",
-	chk: "chk",
-	cmc: "cmc",
-	cne: "cne",
-	cvd: "cvd",
-	cvm: "cvm",
-	dca: "dca",
-	dcv: "dcv",
-	dvi: "dvi",
-	dvr: "dvr",
-	erb: "erb",
-	err: "err",
-	exi: "exi",
-	flc: "flc",
-	ica: "ica",
-	icp: "icp",
-	icv: "icv",
-	ieq: "ieq",
-	ige: "ige",
-	igt: "igt",
-	ile: "ile",
-	ilt: "ilt",
-	ine: "ine",
-	ino: "ino",
-	iov: "iov",
-	itr: "itr",
-	jsrerr: "jsrerr",
-	lcp: "lcp",
-	lcw: "lcw",
-	ldi: "ldi",
-	ldr: "ldr",
-	lei: "lei",
-	load: "load",
+
+var opName = map[uint32]string{
+	add:     "add",
+	adi:     "adi",
+	adr:     "adr",
+	anb:     "anb",
+	aov:     "aov",
+	bct:     "bct",
+	beq:     "beq",
+	bev:     "bev",
+	bge:     "bge",
+	bgt:     "bgt",
+	bhi:     "bhi",
+	ble:     "ble",
+	blo:     "blo",
+	blt:     "blt",
+	bne:     "bne",
+	bnz:     "bnz",
+	bod:     "bod",
+	bri:     "bri",
+	brn:     "brn",
+	bsw:     "bsw",
+	bze:     "bze",
+	call:    "call",
+	chk:     "chk",
+	cmc:     "cmc",
+	cne:     "cne",
+	cvd:     "cvd",
+	cvm:     "cvm",
+	dca:     "dca",
+	dcv:     "dcv",
+	dvi:     "dvi",
+	dvr:     "dvr",
+	erb:     "erb",
+	err:     "err",
+	exi:     "exi",
+	flc:     "flc",
+	ica:     "ica",
+	icp:     "icp",
+	icv:     "icv",
+	ieq:     "ieq",
+	ige:     "ige",
+	igt:     "igt",
+	ile:     "ile",
+	ilt:     "ilt",
+	ine:     "ine",
+	ino:     "ino",
+	iov:     "iov",
+	itr:     "itr",
+	jsrerr:  "jsrerr",
+	lcp:     "lcp",
+	lcw:     "lcw",
+	ldi:     "ldi",
+	ldr:     "ldr",
+	lei:     "lei",
+	load:    "load",
 	loadcfp: "loadcfp",
-	loadi: "loadi",
-	lsh: "lsh",
-	mfi: "mfi",
-	mli: "mli",
-	mlr: "mlr",
-	mov: "mov",
-	move: "move",
-	mvc: "mvc",
-	mvw: "mvw",
-	mwb: "mwb",
-	ngi: "ngi",
-	ngr: "ngr",
-	nzb: "nzb",
-	orb: "orb",
-	plc: "plc",
-	pop: "pop",
-	popr: "popr",
-	ppm: "ppm",
-	prc: "prc",
-	psc: "psc",
-	push: "push",
-	pushi: "pushi",
-	pushr: "pushr",
-	realop: "realop",
-	req: "req",
-	rge: "rge",
-	rgt: "rgt",
-	rle: "rle",
-	rlt: "rlt",
-	rmi: "rmi",
-	rne: "rne",
-	rno: "rno",
-	rov: "rov",
-	rsh: "rsh",
-	rti: "rti",
-	sbi: "sbi",
-	sbr: "sbr",
-	scp: "scp",
-	store: "store",
-	sub: "sub",
-	sys: "sys",
-	trc: "trc",
-	xob: "xob",
-	zrb: "zrb",
+	loadi:   "loadi",
+	lsh:     "lsh",
+	mfi:     "mfi",
+	mli:     "mli",
+	mlr:     "mlr",
+	mov:     "mov",
+	move:    "move",
+	mvc:     "mvc",
+	mvw:     "mvw",
+	mwb:     "mwb",
+	ngi:     "ngi",
+	ngr:     "ngr",
+	nzb:     "nzb",
+	orb:     "orb",
+	plc:     "plc",
+	pop:     "pop",
+	popr:    "popr",
+	ppm:     "ppm",
+	prc:     "prc",
+	psc:     "psc",
+	push:    "push",
+	pushi:   "pushi",
+	pushr:   "pushr",
+	realop:  "realop",
+	req:     "req",
+	rge:     "rge",
+	rgt:     "rgt",
+	rle:     "rle",
+	rlt:     "rlt",
+	rmi:     "rmi",
+	rne:     "rne",
+	rno:     "rno",
+	rov:     "rov",
+	rsh:     "rsh",
+	rti:     "rti",
+	sbi:     "sbi",
+	sbr:     "sbr",
+	scp:     "scp",
+	store:   "store",
+	sub:     "sub",
+	sys:     "sys",
+	trc:     "trc",
+	xob:     "xob",
+	zrb:     "zrb",
 }

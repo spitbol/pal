@@ -11,7 +11,7 @@ var ifileName string
 
 func main() {
 	flag.BoolVar(&itrace,"it",false,"intstruction trace")
-	flag.BoolVar(&otrace,"ot",true,"osint call trace")
+	flag.BoolVar(&otrace,"ot",false,"osint call trace")
 	flag.BoolVar(&strace,"st",false,"statement trace")
 	flag.Parse()
 	if flag.NArg() == 0 {

@@ -911,11 +911,11 @@ g.brn
         
 
 g.bsw	
-	genop('loadi',r1,,i.text(i2))
+	genop('loadi',r1,,getarg(i2))
 	genop(incode,get1(),r1,getarg(i3))	:(opnext)
 
 g.iff   
-	putconst(i.text(i2))			:(opnext)
+	putconst(getarg(i2))			:(opnext)
 
 g.esw						:(opnext)
 
@@ -926,7 +926,7 @@ g.ent
 	putlab(inlabel)				
 						:(opnext)
 
-g.bri	genop(incode,getarg(i1))		:(opnext)
+g.bri	genop(incode,get1())			:(opnext)
 
 g.lei	
 	genop(incode,i.text(i1))		:(opnext)
@@ -953,7 +953,7 @@ g.ppm
 g.prc
 	prc_names[program_counter] = inlabel
 	prc.args = getarg(i2)
-	ppm_cases[thislabel] = i.text(i2)
+	ppm_cases[thislabel] = getarg(i2)
 	thislabel =
 	max_exi = gt(prc.args,max_exi) prc.args
 	prc.type = i.text(i1)			:($('g.prc.' prc.type))
@@ -1166,7 +1166,7 @@ g.xob
 
 g.rsh
 g.lsh
-	genop(incode,getarg(i1),getarg(i2))	:(opnext)
+	genop(incode,getarg(i1),,getarg(i2))	:(opnext)
 
 g.cmb   genop(incode,getarg(i1))		:(opnext)
 
@@ -1208,8 +1208,8 @@ g.rti
 
 g.ctw
 g.ctb
-	output = incode ' ' i.text(i1) ' ' i.text(i2)
-	ident(i.text(i2),'0')			:s(opnext)
+*	output = incode ' ' i.text(i1) ' ' i.text(i2)
+	ident(getarg(i2),'0')			:s(opnext)
 	genop(incode,getarg(i1),,getarg(i2))	:(opnext)
 	
 g.cvm
@@ -1237,8 +1237,7 @@ g.chk						:(op.none)
 g.dac
 g.dbc
 g.dic
-	putconst(i.text(i1))
-						:(opnext)
+	putconst(getarg(i1))			 :(opnext)
 g.drc
 	str = i.text(i1)
 *	strip leading +

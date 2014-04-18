@@ -453,7 +453,7 @@ config.i32-8
 	equ_defs['cfp_f'] = '2'
 	equ_defs['cfp_i'] = '1'
 	equ_defs['cfp_l'] = '4294967295'
-*	equ_defs['cfp_m'] = '2147483647'
+	equ_defs['cfp_m'] = '2147483647'
 	equ_defs['cfp_n'] = '32'
  	equ_defs['cfp_r'] = '1'
 	equ_defs['cfp_u'] = '128'

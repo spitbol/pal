@@ -68,7 +68,8 @@
 *      .ctmd                 define if systm unit is decisecond
 .def   .cucf                 define to include cfp$u
 .def   .cuej                 define to suppress needless ejects
-.def   .culc                 define to include &case (lc names)
+* disable mixed-case support for debugging later 17 apr 2014
+*def   .culc                 define to include &case (lc names)
 .def   .culk                 define to include &lcase, &ucase keywords
 .def   .cust                 define to include set() code
 *      .cusr                 define to have set() use real values

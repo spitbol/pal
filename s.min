@@ -4971,7 +4971,7 @@ lcase  dac  b_scl
 *
 ucase  dac  b_scl
        dac  26
-       dtc  /abcdefghijklmnopqrstuvwxyz/
+       dtc  /ABCDEFGHIJKLMNOPQRSTUVWXYZ/
 .fi
        ejc
 *
