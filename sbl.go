@@ -19,7 +19,6 @@ func main() {
 		return
 	}
 	ifileName = flag.Arg(0)
-	fmt.Println("input file name",ifileName)
 	if itrace || strace {
 		otrace = true
 	}

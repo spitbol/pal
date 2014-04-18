@@ -80,8 +80,8 @@ func sysdt() uint32 {
 }
 
 func sysea() uint32 {
-	fmt.Printf("sysea wa %v wb %v wc %v xr %v %v\n",
-		reg[wa], reg[wb], reg[wc], reg[xr], reg[xl])
+//	fmt.Printf("sysea wa %v wb %v wc %v xr %v %v\n",
+//		reg[wa], reg[wb], reg[wc], reg[xr], reg[xl])
 	// no action for now
 	_ = printscb(xl, 0)
 	return 0
@@ -113,14 +113,17 @@ func setscblk(b uint32, str string) {
 }
 
 func sysem() uint32 {
-	fmt.Println("sysem number", reg[wa])
 	if int(reg[wa]) > len(error_messages) { // return null string if error number out of range
 		reg[xr] = uint32(scblk0)
 		return 0
 	}
-	message := error_messages[reg[xr]]
-	reg[xr] = minString(scblk1, maxreclen, message)
-	printscb(xr, 0)
+	message, ok := error_messages[reg[wa]]
+	if ok {
+		reg[xr] = minString(scblk1, maxreclen, message)
+	} else {
+		mem[scblk1+1] = 0 // return null string
+		reg[xr] = scblk1
+	}
 	return 0
 }
 
@@ -360,7 +363,6 @@ func sysrd() uint32 {
 	switch sysrds {
 	case 1:
 		// here to open the input file and return its name
-		fmt.Println("opening ", ifileName)
 		ifile, err = os.Open(ifileName)
 		if err != nil {
 			fmt.Printf("cannot open %v\n", ifileName)
@@ -368,16 +370,12 @@ func sysrd() uint32 {
 		}
 		scanner = bufio.NewScanner(ifile)
 		_ = minString(reg[xr], reg[wc], ifileName)
-		printscb(xr, reg[wc])
 		return 1
 	default:
 		// read next line from ifile, quit on EOF
 		scanned := scanner.Scan()
 		if scanned {
 			line := scanner.Text()
-			if otrace {
-				fmt.Println("sysrd read", line)
-			}
 			_ = minString(reg[xr], reg[wc], line)
 			reg[wc] = uint32(len(line))
 			printscb(xr, reg[wc])
@@ -463,7 +461,6 @@ func syscall(ea uint32) uint32 {
 		return sysej()
 
 	case sysem_:
-		fmt.Println("enter sysem ip ",ip)
 		return sysem()
 
 	case sysen_:

@@ -118,8 +118,9 @@ run:
 		src = inst >> src_ & src_m
 		off = inst >> off_ & off_m
 		if itrace {
-			fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v %v\n",
-				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs], reg[cp])
+			fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
+				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
+				 reg[cp],int32(reg[ia]))
 			fmt.Printf(" %v %v %v %v %v %v\n", ip,
 				op, opName[op], regName[dst], regName[src], off)
 
@@ -131,8 +132,9 @@ run:
 		switch op {
 		case stmt:
 			if strace {
-				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v %v\n",
-					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs], reg[cp])
+				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
+					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
+					 reg[xl], reg[xr], reg[xs], reg[cp], int32(reg[ia]))
 				fmt.Printf("  %v\n", stmt_text[off])
 			}
 		case mov:
@@ -260,8 +262,8 @@ run:
 			reg[ia] = reg[dst]
 		//TODO: Reminder that ia is SIGNED integer when doing arithmetic
 		case adi:
-			long1, long2 = int64(reg[ia]), int64(reg[dst])
-			long1 = long1 + long2
+			long1, long2 = int64(int32(reg[ia])), int64(int32(reg[dst]))
+			long1 += long2
 			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				overflow = true
 			} else {
@@ -269,8 +271,8 @@ run:
 				reg[ia] = uint32(long1)
 			}
 		case mli:
-			long1, long2 = int64(reg[ia]), int64(reg[dst])
-			long1 = long1 * long2
+			long1, long2 = int64(int32(reg[ia])), int64(int32(reg[dst]))
+			long1 *= long2
 			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				overflow = true
 			} else {
@@ -278,8 +280,8 @@ run:
 				reg[ia] = uint32(long1)
 			}
 		case sbi:
-			long1, long2 = int64(reg[ia]), int64(reg[dst])
-			long1 = long1 - long2
+			long1, long2 = int64(int32(reg[ia])), int64(int32(reg[dst]))
+			long1 -= long2
 			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				overflow = true
 			} else {
