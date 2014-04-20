@@ -1216,7 +1216,7 @@ g.ctb
 	genop(incode,getarg(i1),,getarg(i2))	:(opnext)
 	
 g.cvm
-	genop(incode,getarg(i1))		:(opnext)
+	genop(incode,,,getarg(i1))		:(opnext)
 
 g.cvd						:(op.none)
 

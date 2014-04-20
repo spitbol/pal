@@ -82,11 +82,11 @@ var (
 	mem      [100000]uint32
 	reg      [16]uint32
 	stackEnd uint32
-	memLast	 uint32 // index of last allocated memory word
+	memLast  uint32 // index of last allocated memory word
 )
 
 func interp() {
-	instn := 0
+//	instn := 0
 	var long1, long2 int64
 	//	var int1,int2 int32
 	var int1, int2 int32
@@ -98,13 +98,13 @@ func interp() {
 	var d1 float64
 
 	ip = start
-/*
-			fmt.Printf(" startup r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
-				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
-				 reg[cp],int32(reg[ia]))
-	fmt.Printf("start interp mem len %v  ip %v r0 %v\n",len(mem),ip,reg[r0])
-	fmt.Printf("s_aaa %v s_yyy %v\n",s_aaa,s_yyy)
-*/
+	/*
+				fmt.Printf(" startup r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
+					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
+					 reg[cp],int32(reg[ia]))
+		fmt.Printf("start interp mem len %v  ip %v r0 %v\n",len(mem),ip,reg[r0])
+		fmt.Printf("s_aaa %v s_yyy %v\n",s_aaa,s_yyy)
+	*/
 run:
 	for {
 		if reg[r0] != 0 {
@@ -113,15 +113,18 @@ run:
 		}
 		if ip < s_aaa || ip > s_yyy {
 			fmt.Println("ip out of range ", ip)
-			fmt.Println(" aaa yyy",s_aaa,s_yyy)
+			fmt.Println(" aaa yyy", s_aaa, s_yyy)
 			return
 		}
 		inst = mem[ip]
+/*
 		instn++
 		if instn > 150000 {
 			fmt.Println("instruction limit exceeded", instn)
 			return
 		}
+*/
+
 		op = inst & op_m
 		dst = inst >> dst_ & dst_m
 		src = inst >> src_ & src_m
@@ -129,7 +132,7 @@ run:
 		if itrace {
 			fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
-				 reg[cp],int32(reg[ia]))
+				reg[cp], int32(reg[ia]))
 			fmt.Printf(" %v %v %v %v %v %v\n", ip,
 				op, opName[op], regName[dst], regName[src], off)
 
@@ -143,7 +146,7 @@ run:
 			if strace {
 				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
-					 reg[xl], reg[xr], reg[xs], reg[cp], int32(reg[ia]))
+					reg[xl], reg[xr], reg[xs], reg[cp], int32(reg[ia]))
 				fmt.Printf("  %v\n", stmt_text[off])
 			}
 		case mov:
@@ -439,7 +442,12 @@ run:
 			}
 			reg[xl], reg[xr] = 0, 0
 		case trc:
-			panic("trc not implemented")
+			n := int(reg[wa])
+			ixl := int(reg[xl])
+			ixr := int(reg[xr])
+			for i := 0; i < n; i++ {
+				mem[ixl+i] = mem[ixr+int(mem[ixl+i])]
+			}
 		case flc:
 			panic("flc not implemented")
 		case anb:
@@ -475,7 +483,7 @@ run:
 		case ctb, ctw:
 			reg[dst] += off
 		case cvm:
-			long1 = int64(reg[ia])*10 - (int64(reg[wb]) - 0x30)
+			long1 = int64(int32(reg[ia]))*10 - int64(reg[wb]-'0')
 			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				ip = off
 			}
@@ -483,7 +491,7 @@ run:
 		case cvd:
 			int1 = int32(reg[ia])
 			reg[ia] = uint32(int1 / 10)
-			reg[wa] = uint32(-(int1 % 10) + 0x30)
+			reg[wa] = uint32(-(int1 % 10) + '0')
 		case mvc, mvw:
 			n := int(reg[wa])
 			for i := 0; i < n; i++ {
@@ -591,22 +599,22 @@ func startup() int {
 		mem[i] = program[i]
 		//		fmt.Printf("mem %v %x\n",i,mem[i])
 	}
-		memLast =  uint32(len(program)) + 10
-		// scblk is just four words, sufficient to hold null string
-		scblk0 = memLast
-		scblk1 = memLast + 4
-		scblk2 = scblk1 + maxreclen + 1
-		memLast += maxreclen + 1
-		stackEnd = uint32(memLast)
-		memLast += stackLength
-		stackStart := uint32(memLast)
-		memLast += 10
-		reg[xl] = memLast // start data area
+	memLast = uint32(len(program)) + 10
+	// scblk is just four words, sufficient to hold null string
+	scblk0 = memLast
+	scblk1 = memLast + 4
+	scblk2 = scblk1 + maxreclen + 1
+	memLast += maxreclen + 1
+	stackEnd = uint32(memLast)
+	memLast += stackLength
+	stackStart := uint32(memLast)
+	memLast += 10
+	reg[xl] = memLast // start data area
 	// allocate 10000 words for initial data area
-		memLast += 10000
-		reg[xr] = memLast  // end data area
-		reg[xs] = stackStart
-		reg[wa] = reg[xs] - 1
+	memLast += 10000
+	reg[xr] = memLast // end data area
+	reg[xs] = stackStart
+	reg[wa] = reg[xs] - 1
 	interp()
 	return 0
 }
