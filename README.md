@@ -1,4 +1,4 @@
 gobol
 =========
 
-Implementation of Macro SPITBOL in the Go language
+An implementation of SNOBOL in the Go language
