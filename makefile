@@ -1,8 +1,7 @@
 # X32 SPITBOL makefile using gcc
 #
 
-ARCH?=i32
-CHARBITS=8
+ARCH?=m32
 DEBUG?=0
 EXECUTABLE=spitbol
 UNICODE?=0
@@ -20,8 +19,6 @@ vpath %.c $(OSINT)
 
 
 
-CC	=	gcc
-ASM	=	nasm
 INCDIRS = -I./tcc/include -I./musl/include
 # next is for tcc
 ifeq	($(DEBUG),0)
@@ -32,14 +29,14 @@ endif
 
 # Assembler info -- Intel 32-bit syntax
 ifeq	($(DEBUG),0)
-ASMFLAGS = -f $(ELF) -DCHARBITS=$(CHARBITS)
+ASMFLAGS = -f $(ELF) 
 else
-ASMFLAGS = -g -f $(ELF) -DCHARBITS=$(CHARBITS)
+ASMFLAGS = -g -f $(ELF) 
 endif
 
 # Tools for processing Minimal source file.
 LEX=	lex.spt
-COD=    asm.spt
+COD=    go.spt
 ERR=    err.spt
 BASEBOL =   spitbol
 
@@ -62,7 +59,6 @@ UHDRS=	$(OSINT)/systype.h $(OSINT)/extern32.h $(OSINT)/blocks32.h $(OSINT)/syste
 HDRS=	$(CHDRS) $(UHDRS)
 
 # Headers for Minimal source translation:
-VHDRS=	$(ARCH).hdr 
 
 # OSINT objects:
 SYSOBJS=sysax.o sysbs.o sysbx.o syscm.o sysdc.o sysdt.o sysea.o \
@@ -120,14 +116,14 @@ err.o: err.s
 
 # SPITBOL Minimal source
 s.go:	s.lex go.spt
-	$(BASEBOL) -u i32 go.spt
+	$(BASEBOL) go.spt
 
-s.s:	s.lex $(VHDRS) $(COD) 
-	$(BASEBOL) -u $(ARCH)-$(CHARBITS) $(COD)
+s.s:	s.lex $(COD) 
+	$(BASEBOL) -u $(ARCH) $(COD)
 
 s.lex: $(MINPATH)$(MIN).min $(MIN).cnd $(LEX)
 #	 $(BASEBOL) -u "s" $(LEX)
-	 $(BASEBOL) -u $(ARCH)-$(CHARBITS) $(LEX)
+	 $(BASEBOL) -u $(ARCH) $(LEX)
 
 s.err: s.s
 

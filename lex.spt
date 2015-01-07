@@ -1,7 +1,7 @@
 -title lex: phase 1 translation from minimal to lexemes (lexemes)
 -stitl initialization
 * copyright 1987-2012 robert b. k. dewar and mark emmer.
-* copyright 2012 david shields
+* copyright 2012-2015 david shields
 *
 * this file is part of macro spitbol.
 *
@@ -21,11 +21,10 @@
 *
 *	usage:
 *
-*	spitbol -u "infile<sep>condfile<sep>outfile" lex
+*	spitbol -u "infile<sep>outfile" lex
 *
 *	where:
 *	 infile    - minimal file name, less .min extension
-*	 condfiile - conditional file name, less .cnd extension
 *	 outfile   - output file name, less .lex extension.
 *		     default is infile.lex.
 *	 <sep>	   - ; or :
@@ -442,12 +441,10 @@ main2
 . 'ch_sq[039]ch_un[095]ch_ob[091]ch_cb[093]ch_ht[009]ch_vt[011]'
 . 'ch_ey[094]iodel[032]' )
 * set target-dependent configuration parameters
-	:($('config.' arch))
 
-config.i32
-config.i32-8
 	aname = 'i32'
 	equ_defs['cfp_a'] = '256'
+*	equ_defs['cfp_a'] = '110182'			* for unicode
 	equ_defs['cfp_b'] = '1'
 	equ_defs['cfp_c'] = '1'
 	equ_defs['cfp_f'] = '2'
@@ -457,63 +454,8 @@ config.i32-8
 	equ_defs['cfp_n'] = '32'
  	equ_defs['cfp_r'] = '1'
 	equ_defs['cfp_u'] = '128'
-*	use 24 characters, for hash in i32
-	equ_defs['e_hnw'] = '0'
-
-							:(config.done)
-config.x32
-config.x32-8
-	aname = 'x32'
-	equ_defs['cfp_a'] = '256'
-	equ_defs['cfp_b'] = '4'
-	equ_defs['cfp_c'] = '4'
-	equ_defs['cfp_f'] = '8'
-	equ_defs['cfp_i'] = '1'
-	equ_defs['cfp_l'] = '4294967295'
-	equ_defs['cfp_m'] = '2147483647'
-	equ_defs['cfp_n'] = '32'
- 	equ_defs['cfp_r'] = '2'
-	equ_defs['cfp_u'] = '128'
 *	use 6 words, or 24 characters, for hash in x32
 	equ_defs['e_hnw'] = '6'
-
-							:(config.done)
-config.x32-32
-	aname = 'x32'
-	equ_defs['cfp_a'] = '110182'
-	equ_defs['cfp_b'] = '4'
-	equ_defs['cfp_c'] = '1'
-	equ_defs['cfp_f'] = '8'
-	equ_defs['cfp_i'] = '1'
-	equ_defs['cfp_l'] = '4294967295'
-	equ_defs['cfp_m'] = '2147483647'
-	equ_defs['cfp_n'] = '32'
- 	equ_defs['cfp_r'] = '2'
-	equ_defs['cfp_u'] = '128'
-*	use 6 words, or 24 characters, for hash in x32
-*       set e_hnw to zero for unicode, to indicate at
-*       runtime there is just one character per word.
-	equ_defs['e_hnw'] = '0'
-
-							:(config.done)
-
-config.x64
-	aname = 'x64'
-	equ_defs['cfp_a'] = '256'
-	equ_defs['cfp_b'] = '8'
-	equ_defs['cfp_c'] = '8'
-	equ_defs['cfp_f'] = '16'
-	equ_defs['cfp_i'] = '1'
-	equ_defs['cfp_l'] = '18446744073709551616'
-	equ_defs['cfp_m'] = '18446744073709551615'
-	equ_defs['cfp_n'] = '64'
- 	equ_defs['cfp_r'] = '1'
-	equ_defs['cfp_u'] = '128'
-*	use 3 words, or 24 characters, for hash in x64
-*	this is done so hashes for x32 and x64 should agree
-	equ_defs['e_hnw'] = '3'
-config.done
-
 *
   :(dsout)
   &trace = 4000
