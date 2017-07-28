@@ -35,9 +35,9 @@ ASMFLAGS = -g -f $(ELF)
 endif
 
 # Tools for processing Minimal source file.
-LEX=	lex.spt
-COD=    go.spt
-ERR=    err.spt
+LEX=	lex.sbl
+COD=    go.sbl
+ERR=    err.sbl
 BASEBOL =   spitbol
 
 # Implicit rule for building objects from C files.
@@ -115,8 +115,8 @@ err.o: err.s
 
 
 # SPITBOL Minimal source
-s.go:	s.lex go.spt
-	$(BASEBOL) go.spt
+s.go:	s.lex go.sbl
+	$(BASEBOL) go.sbl
 
 s.s:	s.lex $(COD) 
 	$(BASEBOL) -u $(ARCH) $(COD)
@@ -152,8 +152,8 @@ clean:
 
 z:
 	nm -n s.o >s.nm
-	spitbol map-$(ARCH).spt <s.nm >s.dic
-	spitbol z.spt <ad >ae
+	spitbol map-$(ARCH).sbl <s.nm >s.dic
+	spitbol z.sbl <ad >ae
 
 sclean:
 # clean up after sanity-check
