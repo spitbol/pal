@@ -84,7 +84,7 @@
 
 *  default the parameter string if none present
 *
-        arch = (differ(host(0)) host(0), "i32")
+        arch = (differ(host(0)) host(0), "i64")
 	
 	output = 'target architecture ' arch
 *        output = ident(fileprefix) "filename (.lex) required" :s(end)
@@ -95,7 +95,7 @@
 *       these should agree with values used in translator
 * set target-dependent configuration parameters
 
-	hdr = 'i32'
+	hdr = 'i64'
 *	op_w is instruction suffix for word-size
 	op_w = ''
 *	op_c is instruction suffix for minimal character size
@@ -324,7 +324,7 @@ flgs2
 	xl = 'xl'; xr = 'xr'; xs = 'xs'; xt = 'xl'
 	wa = 'wa'; wb = 'wb'; wc = 'wc'
 	ia = 'ia'; cp = 'cp'; ra = 'ra'
-* user rc for error handling (this is memory location in x32 version)
+* user rc for error handling (this is memory location in x64 version)
 	r1 = 'r1'
 	r2 = 'r2'
 
@@ -337,7 +337,7 @@ flgs2
 	xl = 'xl'; xr = 'xr'; xs = 'xs'; xt = 'xl'
 	wa = 'wa'; wb = 'wb'; wc = 'wc'
 	ia = 'ia'; cp = 'cp'; ra = 'ra'
-* user rc for error handling (this is memory location in x32 version)
+* user rc for error handling (this is memory location in x64 version)
 	r1 = 'r1'
 	r2 = 'r2'
 
@@ -1323,7 +1323,7 @@ g.sec.2
 g.sec.3
 	putline(tab ')')
 	putline('//sec03')
-	putline('var program = []uint32 {')
+	putline('var program = []uint64 {')
 * emit single word so program counter will start at one.
 	putline(tab "0,")
 	program_counter = 1
@@ -1423,7 +1423,7 @@ g.end.labels
 * TODO - fix declaration below
 	:(g.end.4a)
 * write out any real constants that need to be patched into the program text
-	putline('reals = map[int] float32 {')
+	putline('reals = map[int] float64 {')
 	drcara = sort(drctab,1)
 	i = 0
 g.end.reals
@@ -1474,13 +1474,13 @@ g.end.ppm.1
 *	emit error messages
 	ara = sort(error_messages,1)
 	i = 0
-	putline('var error_messages = map[uint32]string {')
+	putline('var error_messages = map[int]string {')
 g.end.11
 	i = i + 1
 	putline(tab ara<i,1> tab ': "' ara<i,2> '",')	:s(g.end.11)
 	putline("}")
 	
-	putline('var prc_names = map[uint32]string {')
+	putline('var prc_names = map[int]string {')
 	prc_ara = sort(prc_names,1)
 	i = 0
 g.end.prc_names
@@ -1491,7 +1491,7 @@ g.end.prc_names
 g.end.prc_names.1
 	putline('}')
 
-	putline('var stmt_text = map[uint32]string {')
+	putline('var stmt_text = map[int]string {')
 	i = 0
 g.end.stmts
 	gt(i = i + 1, stmtn)			:s(g.end.stmts.1)
