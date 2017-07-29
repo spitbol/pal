@@ -29,9 +29,9 @@ type fcblk struct { // file control block
 // to the interpreter in the form of an scblk.
 
 var (
-	scblk0    uint32 // null string
-	scblk1    uint32
-	scblk2    uint32
+	scblk0    uint64 // null string
+	scblk1    uint64
+	scblk2    uint64
 	fcblkid   int
 	fcblks    map[int]*fcblk
 	fcb0      *fcblk // fcblk for stdin
@@ -41,37 +41,37 @@ var (
 	timeStart time.Time
 )
 
-func sysax() uint32 {
+func sysax() uint64 {
 	// Will need to mimic the swcoup function if want to use spitbol as unix filter
 	return 0
 }
 
-func sysbs() uint32 {
+func sysbs() uint64 {
 	panic("sysbs not implemented.")
 }
 
-func sysbx() uint32 {
+func sysbx() uint64 {
 	timeStart = time.Now()
 	return 0
 	panic("sysbx not implemented.")
 }
 
-func syscm() uint32 {
+func syscm() uint64 {
 	// syscm needed only if .ccmc conditional option selected
 	panic("syscm not implemented.")
 }
 
-func sysdc() uint32 {
+func sysdc() uint64 {
 	// SPITBOL now open open source, so no need to check expiry of trial version.
 	return 0
 }
 
-func sysdm() uint32 {
+func sysdm() uint64 {
 	// No core dump for now.
 	return 0
 }
 
-func sysdt() uint32 {
+func sysdt() uint64 {
 	t := time.Now()
 	// TODO: Need to initialize scblk1 and scblk2 to blocks im mem[]
 	s := t.Format(time.RFC822)
@@ -79,7 +79,7 @@ func sysdt() uint32 {
 	return 0
 }
 
-func sysea() uint32 {
+func sysea() uint64 {
 //	fmt.Printf("sysea wa %v wb %v wc %v xr %v %v\n",
 //		reg[wa], reg[wb], reg[wc], reg[xr], reg[xl])
 	// no action for now
@@ -87,12 +87,12 @@ func sysea() uint32 {
 	return 0
 }
 
-func sysef() uint32 {
+func sysef() uint64 {
 	// sysef is eject file. sysen is endfile
 	return 0
 }
 
-func sysej() uint32 {
+func sysej() uint64 {
 	// close open files
 	for _, fcb := range fcblks {
 		if fcb.open {
@@ -105,19 +105,19 @@ func sysej() uint32 {
 	return 999
 }
 
-func setscblk(b uint32, str string) {
+func setscblk(b uint64, str string) {
 	for i := 0; i < len(str); i++ {
-		mem[int(b)+2+i] = uint32(str[i])
+		mem[int(b)+2+i] = uint64(str[i])
 	}
-	mem[b+1] = uint32(len(str))
+	mem[b+1] = uint64(len(str))
 }
 
-func sysem() uint32 {
+func sysem() uint64 {
 	if otrace {
 	fmt.Println("sysem ", reg[wa])
 	}
 	if int(reg[wa]) > len(error_messages) { // return null string if error number out of range
-		reg[xr] = uint32(scblk0)
+		reg[xr] = uint64(scblk0)
 		return 0
 	}
 	message, ok := error_messages[reg[wa]]
@@ -130,7 +130,7 @@ func sysem() uint32 {
 	return 0
 }
 
-func sysen() uint32 {
+func sysen() uint64 {
 	fcb := fcblks[int(reg[wa])]
 	if fcb == nil {
 		return 1
@@ -146,17 +146,17 @@ func sysen() uint32 {
 	return 0
 }
 
-func sysep() uint32 {
+func sysep() uint64 {
 	os.Stdout.WriteString("\n")
 	return 0
 }
 
-func sysex() uint32 {
+func sysex() uint64 {
 	// call to external function not supported
 	return 1
 }
 
-func sysfc() uint32 {
+func sysfc() uint64 {
 	/* cases
 
 	   1. both null
@@ -173,7 +173,7 @@ func sysfc() uint32 {
 	   4. both non-null
 	   See if channel in use, returning error if so. Then initialize channel.
 	*/
-	//var scblk1,scblk2 []uint32
+	//var scblk1,scblk2 []uint64
 
 	fcbn := int(reg[wa])
 	reg[wa] = 0
@@ -218,7 +218,7 @@ func sysfc() uint32 {
 		fcb.name = goString(scblk2)
 		fcblkid++
 		fcblks[fcblkid] = fcb
-		reg[xl] = uint32(fcblkid) // return private fcblk index
+		reg[xl] = uint64(fcblkid) // return private fcblk index
 		reg[wa] = 0
 		reg[wc] = 0
 		return 0
@@ -226,37 +226,37 @@ func sysfc() uint32 {
 	return 0
 }
 
-func sysgc() uint32 {
+func sysgc() uint64 {
 	// no action needed
 	return 0
 }
 
-func syshs() uint32 {
+func syshs() uint64 {
 	return 1
 }
 
-func sysid() uint32 {
+func sysid() uint64 {
 	reg[xr] = minString(scblk0, maxreclen, " dave")
 	reg[xl] = minString(scblk1, maxreclen, "shields")
 	return 0
 }
 
-func sysif() uint32 {
+func sysif() uint64 {
 	// TODO: support include files.
 	return 1
 }
 
-func sysil() uint32 {
+func sysil() uint64 {
 	reg[wa] = maxreclen
 	reg[wc] = 1 // text file
 	return 0
 }
 
-func sysin() uint32 {
+func sysin() uint64 {
 	panic("sysin not implemented.")
 }
 
-func sysio() uint32 {
+func sysio() uint64 {
 	var err error
 	var file *os.File
 	if reg[wa] == 0 {
@@ -291,11 +291,11 @@ func sysio() uint32 {
 	return 0
 }
 
-func sysld() uint32 {
+func sysld() uint64 {
 	return 1
 }
 
-func sysmm() uint32 {
+func sysmm() uint64 {
 	old := int(memLast)
 	new := old
 	if new >= len(mem) - 1 {
@@ -306,19 +306,19 @@ func sysmm() uint32 {
 		if new >= len(mem) - 1 {
 			new = len(mem) - 1
 		}
-		reg[xr] = uint32(new - old)
-		memLast = uint32(new)
+		reg[xr] = uint64(new - old)
+		memLast = uint64(new)
 	}
 	return 0
 }
 
-func sysmx() uint32 {
+func sysmx() uint64 {
 	// return default
 	reg[wa] = 0
 	return 0
 }
 
-func sysou() uint32 {
+func sysou() uint64 {
 	var fcb *fcblk
 	if reg[wa] == 0 {
 		fcb = fcb2
@@ -333,22 +333,22 @@ func sysou() uint32 {
 	return writeLine(fcb, reg[xr])
 }
 
-func syspi() uint32 {
+func syspi() uint64 {
 	return writeLine(fcb2, reg[xr])
 }
 
-func syspl() uint32 {
+func syspl() uint64 {
 	return 0
 }
 
-func syspp() uint32 {
+func syspp() uint64 {
 	reg[wa] = 100
 	reg[wb] = 60
 	reg[wc] = 0
 	return 0
 }
 
-func syspr() uint32 {
+func syspr() uint64 {
 	if reg[wa] == 0 { // if null line
 		os.Stdout.WriteString("\n")
 		return 0
@@ -363,7 +363,7 @@ var sysrds int
 var ifile *os.File
 var scanner *bufio.Scanner
 
-func sysrd() uint32 {
+func sysrd() uint64 {
 	var err error
 	sysrds++
 	scblk := mem[reg[xr]:]
@@ -392,7 +392,7 @@ func sysrd() uint32 {
 		if scanned {
 			line := scanner.Text()
 			_ = minString(reg[xr], reg[wc], line)
-			reg[wc] = uint32(len(line))
+			reg[wc] = uint64(len(line))
 			printscb(xr, reg[wc])
 			return 0
 		}
@@ -408,40 +408,40 @@ func sysrd() uint32 {
 	return 999
 }
 
-func sysri() uint32 {
+func sysri() uint64 {
 	n := readLine(fcb0, reg[xr], mem[reg[xr]+1])
 	return n
 }
 
-func sysrw() uint32 {
+func sysrw() uint64 {
 	return 2
 }
 
-func sysst() uint32 {
+func sysst() uint64 {
 	return 5
 }
 
-func systm() uint32 {
+func systm() uint64 {
 	d := time.Since(timeStart)
-	reg[ia] = uint32(d.Nanoseconds() / 1000000)
+	reg[ia] = uint64(d.Nanoseconds() / 1000000)
 	return 0
 }
 
-func systt() uint32 {
+func systt() uint64 {
 	// No trace for now
 	return 0
 	panic("systt not implemented.")
 }
 
-func sysul() uint32 {
+func sysul() uint64 {
 	return 0
 }
 
-func sysxi() uint32 {
+func sysxi() uint64 {
 	return 1
 }
 
-func syscall(ea uint32) uint32 {
+func syscall(ea uint64) uint64 {
 
 	switch ea {
 
@@ -583,7 +583,7 @@ func init() {
 	fcb2.writer = bufio.NewWriter(fcb0.file)
 }
 
-func goString(scblk []uint32) string {
+func goString(scblk []uint64) string {
 	if scblk[1] == 0 {
 		return ""
 	}
@@ -596,26 +596,26 @@ func goString(scblk []uint32) string {
 }
 
 // return scblk from go byte array
-func minBytes(b []byte) []uint32 {
-	var s []uint32
-	s = make([]uint32, len(b)+2)
-	s[1] = uint32(len(b))
+func minBytes(b []byte) []uint64 {
+	var s []uint64
+	s = make([]uint64, len(b)+2)
+	s[1] = uint64(len(b))
 	for i := 1; i < len(b); i++ {
-		s[i+1] = uint32(b[i])
+		s[i+1] = uint64(b[i])
 	}
 	return s
 }
 
 // make scblk from go string
-func minString(scblkid uint32, max uint32, g string) uint32 {
+func minString(scblkid uint64, max uint64, g string) uint64 {
 	s := mem[scblkid:]
 	n := len(g)
 	if n > int(max) {
 		n = maxreclen
 	}
-	s[1] = uint32(n)
+	s[1] = uint64(n)
 	for i := 0; i < n; i++ {
-		s[i+2] = uint32(g[i])
+		s[i+2] = uint64(g[i])
 	}
 	return scblkid
 }
@@ -624,7 +624,7 @@ func check(e error) {
 		panic(e)
 	}
 }
-func writeLine(fcb *fcblk, start uint32) uint32 {
+func writeLine(fcb *fcblk, start uint64) uint64 {
 	scb := int(start)
 	n := int(mem[scb+1])
 
@@ -637,7 +637,7 @@ func writeLine(fcb *fcblk, start uint32) uint32 {
 	return writeNewLine(fcb, true)
 }
 
-func writeNewLine(fcb *fcblk, flush bool) uint32 {
+func writeNewLine(fcb *fcblk, flush bool) uint64 {
 	_, err := fcb.writer.WriteString("\n")
 	if err != nil {
 		return 1
@@ -651,7 +651,7 @@ func writeNewLine(fcb *fcblk, flush bool) uint32 {
 	return 0
 }
 
-func readLine(fcb *fcblk, scb uint32, max uint32) uint32 {
+func readLine(fcb *fcblk, scb uint64, max uint64) uint64 {
 
 	if fcb.eof { // don't go past EOF, just resignal it.
 		return 1
@@ -667,14 +667,14 @@ func readLine(fcb *fcblk, scb uint32, max uint32) uint32 {
 	if len(runes) < n {
 		n = len(runes)
 	}
-	mem[scb+1] = uint32(n)
+	mem[scb+1] = uint64(n)
 	for i := 0; i < n; i++ {
-		mem[int(scb)+2+i] = uint32(runes[i])
+		mem[int(scb)+2+i] = uint64(runes[i])
 	}
 	return 0
 }
 
-var sysName = map[uint32]string{
+var sysName = map[uint64]string{
 	sysax_: "sysax",
 	sysbs_: "sysbs",
 	sysbx_: "sysbx",
@@ -715,7 +715,7 @@ var sysName = map[uint32]string{
 	sysxi_: "sysxi",
 }
 
-func printscb(regno int, actual uint32) int {
+func printscb(regno int, actual uint64) int {
 	scblk := mem[reg[regno]:]
 	n := int(scblk[1])
 	if int(actual) > 0 && n > int(actual) {
