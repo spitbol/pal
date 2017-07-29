@@ -26,7 +26,7 @@ MINPATH=./
 BASEBOL =   ./bin/spitbol
 
 
-spitbol: s.go
+tbol: s.go
 
 
 # SPITBOL Minimal source
