@@ -1,4 +1,5 @@
--title lex: phase 1 translation from minimal to lexemes (lexemes)
+
+-title lex                                              : phase 1 translation from minimal to lexemes (lexemes)
 -stitl initialization
 * copyright 1987-2012 robert b. k. dewar and mark emmer.
 * copyright 2012-2015 david shields
@@ -395,16 +396,16 @@
 *  associate input file to lu1.  if a conditional file was specified,
 *  read it first.
 *
-	input(.infile,1,(differ(filenamc) filenamc,filenami))	:s(main1)
+	input(.infile,1,(differ(filenamc) filenamc,filenami))  :s(main1)
         output = differ(filenamc) "cannot open conditional file: " filenamc
-+						:s(end)
-        output = "cannot open minimal file: " filenami        :(end)
++                                                       :s(end)
+        output = "cannot open minimal file: " filenami  :(end)
 *
 *
 *  associate output file
 *
-main1	output(.outfile,2,filenamo)		:s(main2)
-        output = "cannot open lexeme file: " filenamo  :(end)
+main1	output(.outfile,2,filenamo)                       :s(main2)
+        output = "cannot open lexeme file   : " filenamo  :(end)
 main2
 
 *  patterns used by dostmt
@@ -421,108 +422,112 @@ main2
 
 equ_defs_next
 
-    equ_defs_init break(':') . equ_key ':' break(' ') . equ_value ' ' = :f(equ_defs_done)
-    equ_defs[equ_key] = equ_value                       :(equ_defs_next)
+    equ_defs_init break(':') . equ_key ':' break(' ') . equ_value ' ' =:f(equ_defs_done)
+    equ_defs[equ_key] = equ_value                          :(equ_defs_next)
 
 equ_defs_done
 
-  :(dsout)
-  &trace = 4000
-  &ftrace = 4000
-*  &profile = 1
+                                                           :(dsout)
+*   &trace = 4000
+*   &ftrace = 4000
+*   &profile = 1
+
 dsout
-dostmt	thisline = rdline()
-	crack(thisline)            		:f(dsout)
+
+dostmt
+
+	thisline = rdline()
+	crack(thisline)                                        :f(dsout)
 	differ(label) labenter()
 	argerrs = 0
 
-	opskel = optab[opcode]			:f(ds01)
+	opskel = optab[opcode]                                 :f(ds01)
 	ident(opskel) error("opcode not known")
 	opskel p.opsk1 =
-	ident(argskel,'none')			:s(dos10)
+	ident(argskel,'none')                                  :s(dos10)
 
 *  here if arguments to verify
-dos01	ident(argskel)				:s(dos05)
+dos01	ident(argskel)                                     :s(dos05)
 	argskel p.argskel1 =
 *  accept null argument if this argument optional
-	argthis '*' ident(op1)			:s(dos05)
+	argthis '*' ident(op1)                                 :s(dos05)
 	typ1 = argtype(op1,argthis)
 	argerrs = eq(typ1) argerrs + 1
-	ident(argskel)				:s(dos05)
+	ident(argskel)                                         :s(dos05)
 	argskel p.argskel2 =
-	argthis '*' ident(op2)			:s(dos05)
+	argthis '*' ident(op2)                                 :s(dos05)
 	typ2 = argtype(op2,argthis)
 	argerrs = eq(typ2) argerrs + 1
-	ident(argskel)				:s(dos05)
+	ident(argskel)                                         :s(dos05)
 	argskel p.argskel2 =
-	argthis '*' ident(op3)			:s(dos05)
-	typ3 = argtype(op3,argthis)		:(dos05)
+	argthis '*' ident(op3)                                 :s(dos05)
+	typ3 = argtype(op3,argthis)                            :(dos05)
 	argerrs = eq(typ3) argerrs + 1
 dos10
 dos05
 	gt(argerrs) error('arg type not known')
 *  here if an argument type not recognized
-	opskel ' ' =				:f(dsgen)
+	opskel ' ' =                                           :f(dsgen)
 *  here if post-processing required
-	            :($('g.' opskel))
+                                                           :($('g.' opskel))
 *
 *  get generator entry point (less "g." prefix)
 *
-  :(g.h)
+                                                           :(g.h)
 *  here if bad opcode
-ds01	error('bad op-code')			:(dsout)
+ds01	error('bad op-code')                               :(dsout)
 
 *  generate lexemes.
 *
 ds.typerr
-	error('operand type zero')		:(dsout)
-dsgen   outstmt(label,opcode,op1,op2,op3,comment) :(dsout)
+	error('operand type zero')                             :(dsout)
+dsgen   outstmt(label,opcode,op1,op2,op3,comment)          :(dsout)
 -stitl argform(arg)
 argform
 	argform = 0
 *  determine operand format type as follows
-	ident(t = ityptab[arg])			:s(argform1)
+	ident(t = ityptab[arg])                                :s(argform1)
 *  ityptab has table of cases for types 07,08,09,10,11
 *  if entry in this table, type immediately available:
 *  w reg is 08 x reg is 07 (x)+ is 10 -(x) is 11 (x) is 09
-	argform = t				:(return)
+	argform = t                                            :(return)
 argform1
-	arg p.nos				:s(argform.int)
-	arg '='					:s(argform.eq)
-	arg '*'					:s(argform.star)
-	arg any('+-')				:s(argform.snum)
-	arg break('(')				:s(argform.index)
+	arg p.nos                                              :s(argform.int)
+	arg '='                                                :s(argform.eq)
+	arg '*'                                                :s(argform.star)
+	arg any('+-')                                          :s(argform.snum)
+	arg break('(')                                         :s(argform.index)
 *  here if the only possibility remaining is a name which must be lbl
 *  if the label not yet known, assume it is a plbl
-	ident(t = labtab[arg])			:s(argform.plbl)
-	argform = t				:(return)
+	ident(t = labtab[arg])                                 :s(argform.plbl)
+	argform = t                                            :(return)
 argform.plbl labtab[arg] = 6
-	argform = 6				:(return)
+	argform = 6                                            :(return)
 argform.eq
 	arg len(1) rem . itypa
 	itypa = labtab[itypa]
 	argform = (eq(itypa,2) 18, eq(itypa,6) 22,
-.	gt(itypa,2) itypa + 17) :s(return)
+.	gt(itypa,2) itypa + 17)                                :s(return)
 *  if =lbl and lbl not known, it must be elbl
 	argform = 22
-	labtab[itypa] = 5			:(return)
+	labtab[itypa] = 5                                      :(return)
 argform.star
-	arg len(1) rem . t			:f(return)
-	eq(labtab[t],2)				:f(return)
-	argform = 19				:(return)
-argform.int	argform = 1			:(return)
-argform.snum	arg len(1) p.nos		:f(argform.sreal)
-		argform = 16			:(return)
-argform.sreal	arg len(1) p.real		:f(return)
-		argform = 17			:(return)
+	arg len(1) rem . t                                     :f(return)
+	eq(labtab[t],2)                                        :f(return)
+	argform = 19                                           :(return)
+argform.int	argform = 1                                    :(return)
+argform.snum	arg len(1) p.nos                           :f(argform.sreal)
+		argform = 16                                       :(return)
+argform.sreal	arg len(1) p.real                          :f(return)
+		argform = 17                                       :(return)
 argform.index	arg break('(') . t '(x' any('lrst') ')' rpos(0)
-.						:f(return)
-	t p.nos					:f(argform.index1)
+.                                                       :f(return)
+	t p.nos                                                :f(argform.index1)
 *  here if int(x)
-	argform = 12				:(return)
+	argform = 12                                           :(return)
 argform.index1
-	ident(t = labtab[t])			:s(return)
-	argform = (eq(t,2) 13, eq(t,3) 15, eq(t,4) 14)	:(return)
+	ident(t = labtab[t])                                   :s(return)
+	argform = (eq(t,2) 13, eq(t,3) 15, eq(t,4) 14)         :(return)
 -stitl argtype(op,typ)
 *  this module checks operand types of current operation,
 *  prefixing each operand with type code as given in
@@ -538,23 +543,23 @@ argtype
 *  code reached only if argument not null, so remove the '*'.
 	typ '*' =
 
-	ident(typ,'text') 			:s(arg.text)
-	ident(typ,'dtext') 			:s(arg.dtext)
-	ident(typ,'ptyp')			:s(arg.ptyp)
-	ident(typ,'eqop')			:s(arg.eqop)
+	ident(typ,'text')                                      :s(arg.text)
+	ident(typ,'dtext')                                     :s(arg.dtext)
+	ident(typ,'ptyp')                                      :s(arg.ptyp)
+	ident(typ,'eqop')                                      :s(arg.eqop)
 	itype = argform(op)
 	opform = opformtab<typ>
-	argtype = ne(validform<+opform,itype>) itype	:(return)
+	argtype = ne(validform<+opform,itype>) itype           :(return)
 *	argtype = itype 			:(return)
 
-arg.text argtype = 26 				:(return)
-arg.dtext argtype = 27				:(return)
-arg.ptyp op any('rne')				:f(return)
-	argtype = 25				:(return)
+arg.text argtype = 26                                      :(return)
+arg.dtext argtype = 27                                     :(return)
+arg.ptyp op any('rne')                                     :f(return)
+	argtype = 25                                           :(return)
 arg.eqop
 	op1 = ident(op,'*')
 .			equ_defs[label]
-	argtype = 24				:(return)
+	argtype = 24                                           :(return)
 
 *
 -stitl crack(line)operands,operand,char
@@ -567,29 +572,29 @@ arg.eqop
 *  crack will print an error and fail if a syntax error occurs.
 *
 crack   nstmts  = nstmts + 1
-	line    p.csparse			:f(cs03)
+	line    p.csparse                                      :f(cs03)
 	op1 = op2 = op3 = typ1 = typ2 = typ3 =
-	ident(opcode,'dtc')			:s(cs02)
+	ident(opcode,'dtc')                                    :s(cs02)
 *
 *  now pick out operands until none left
 *
-	operands  p.csoperand = 		:f(cs01)
+	operands  p.csoperand =                                :f(cs01)
 	op1 = operand
-	operands  p.csoperand = 		:f(cs01)
+	operands  p.csoperand =                                :f(cs01)
 	op2 = operand
-	operands  p.csoperand			:f(cs01)
+	operands  p.csoperand                                  :f(cs01)
 	op3 = operand
-cs01	:(return)
+cs01                                                       :(return)
 *
 *  dtc - special case
 *
-cs02	line	p.csdtc				:f(cs03)
+cs02	line	p.csdtc                                    :f(cs03)
 	op1 = operand
-						:(cs01)
+                                                           :(cs01)
 *
 *  here on syntax error
 *
-cs03	error('source line syntax error')	:(freturn)
+cs03	error('source line syntax error')                  :(freturn)
 -stitl error(text)
 *  this module handles reporting of errors with the offending
 *  statement text in thisline.  comments explaining
@@ -603,15 +608,15 @@ error
 	lasterror = noutlines
 	noutlines = noutlines + 2
 	nerrors = nerrors + 1
-.	              			:(dsout)
+.                                                          :(dsout)
 -stitl labenter()tlab
 *  labenter is called to make entry in labtab for a label
 *  current classification is 3 for wlbl, 4 for clbl and 5 for
 *  other labels
 labenter
-	ident(label)				:s(return)
+	ident(label)                                           :s(return)
 	labtab[label] = (eq(sectnow,2) 2, eq(sectnow,3) 4,
-.	eq(sectnow,4) 3 , gt(sectnow,4)  6) 	:(return)
+.	eq(sectnow,4) 3 , gt(sectnow,4)  6)                    :(return)
 -stitl outstmt(label,opcode,op1,op2,op3,comment)t,stmtout
 *
 outstmt
@@ -625,7 +630,7 @@ outstmt
 .	'{' nlines
 	ntarget = ntarget + 1
 	noutlines = noutlines + 1
-.						:(return)
+.                                                          :(return)
 -stitl rdline()
 *  this routine returns the next statement line in the input file
 *  to the caller.  it never fails.  if there is no more input,
@@ -640,103 +645,103 @@ outstmt
 *  lines beginning with ">" are treated as snobol4 statements
 *  and immediately executed.
 *
-rdline	rdline = infile				:f(rl02)
+rdline	rdline = infile                                    :f(rl02)
 	nlines  = nlines + 1
-	ident( rdline )				:s(rdline)
+	ident( rdline )                                        :s(rdline)
 *
 *  transfer control to appropriate conditional assembly
 *  directive generator or other statement generator.
 *
-	leq( substr( rdline,1,1 ),'.' )		:f(other)
-	rdline ? p.condasm			:s( $catab[condcmd] )
-rl00	leq( substr( rdline,1,1 ),'*' )		:f(rl01)
+	leq( substr( rdline,1,1 ),'.' )                        :f(other)
+	rdline ? p.condasm                                     :s( $catab[condcmd] )
+rl00	leq( substr( rdline,1,1 ),'*' )                    :f(rl01)
 
 *
 *  only print comment if requested.
 *
-	outfile = ident(flcflag,'y') rdline	:f(rdline)
-	noutlines = noutlines + 1		:(rdline)
+	outfile = ident(flcflag,'y') rdline                    :f(rdline)
+	noutlines = noutlines + 1                              :(rdline)
 *
 *  here if not a comment line
 *
-rl01	leq( substr( rdline,1,1 ),'>' )		:f(return)
+rl01	leq( substr( rdline,1,1 ),'>' )                    :f(return)
 
 *
 *  here with snobol4 line to execute
 *
-	c = code(substr( rdline, 2 ) "; :(rdline)") :s<c>
+	c = code(substr( rdline, 2 ) "; :(rdline)")            :s<c>
         output = "error compiling snobol4 statement"
-  						:(rl03)
+                                                           :(rl03)
 *
 *  here on eof.  filenamc is non-null if we were reading from it.
 *
-rl02	ident(filenamc)				:s(rl03)
+rl02	ident(filenamc)                                    :s(rl03)
 	filenamc =
 	ignore_defs = 1
 	endfile(1)
-	input(.infile,1,filenami)		:s(rdline)
-        output = "cannot open minimal file: " filenami        :(end)
+	input(.infile,1,filenami)                              :s(rdline)
+        output = "cannot open minimal file: " filenami     :(end)
 
-rl03	rdline = '       end'			:(rl01)
+rl03	rdline = '       end'                              :(rl01)
 *
 *  syntax error handler.
 *
-synerr output = incnt '(syntax error):' rdline            :(rdline)
+synerr output = incnt '(syntax error):' rdline             :(rdline)
 *
 *  process define
 *
-defop  ident( condvar )				:s(synerr)
-       differ( ignore_defs )			:s(rdline)
-       eq( level )				:s(defok)
-       eq( processrec[result(top),mode(top)] )	:s(rdline)
-defok  symtbl[condvar] = 1			:(rdline)
+defop  ident( condvar )                                    :s(synerr)
+       differ( ignore_defs )                               :s(rdline)
+       eq( level )                                         :s(defok)
+       eq( processrec[result(top),mode(top)] )             :s(rdline)
+defok  symtbl[condvar] = 1                                 :(rdline)
 *
 *  process undefine
 *
 undefop
-       ident( condvar )				:s(synerr)
-       eq( level )				:s(undok)
-       eq( processrec[result(top),mode(top)] )	:s(rdline)
-undok  symtbl[condvar] =			:(rdline)
+       ident( condvar )                                    :s(synerr)
+       eq( level )                                         :s(undok)
+       eq( processrec[result(top),mode(top)] )             :s(rdline)
+undok  symtbl[condvar] =                                   :(rdline)
 *
 *  process if
 *
-ifop   ident( condvar )				:s(synerr)
-       eq( level )				:s(ifok)
+ifop   ident( condvar )                                    :s(synerr)
+       eq( level )                                         :s(ifok)
 *
 *  here for .if encountered during bypass state.
 *
-       ne( processrec[result(top),mode(top)] )  :s(ifok)
+       ne( processrec[result(top),mode(top)] )             :s(ifok)
        level    = level + 1
-       top      = statestk[level] = state(bypass,then)    :(rdline)
+       top      = statestk[level] = state(bypass,then)     :(rdline)
 *
 *  here for .if to be processed normally.
 *
 ifok   level    = level + 1
        top      = statestk[level] = state(
 .	             ( differ( symtbl[condvar] ) true,false ),
-.	             then )			:(rdline)
+.	             then )                                    :(rdline)
 *
 *  process .then
 *
-thenop	differ(condvar)				:s(synerr)
-	eq(level)				:s(synerr)f(rdline)
+thenop	differ(condvar)                                    :s(synerr)
+	eq(level)                                              :s(synerr)f(rdline)
 *
 *  process .else
 *
-elseop	differ(condvar)				:s(synerr)
-	mode(top) = ne( level ) else		:s(rdline)f(synerr)
+elseop	differ(condvar)                                    :s(synerr)
+	mode(top) = ne( level ) else                           :s(rdline)f(synerr)
 *
 *  process .fi
 *
-fiop	differ(condvar)				:s(synerr)
-	level = ne( level ) level - 1		:f(synerr)
-	top   = ( ne( level ) statestk[level],'' )     :(rdline)
+fiop	differ(condvar)                                    :s(synerr)
+	level = ne( level ) level - 1                          :f(synerr)
+	top   = ( ne( level ) statestk[level],'' )             :(rdline)
 *
 *  process statements other than conditional directives.
 *
-other	eq( level )				:s(rl00)
-	eq( processrec[result(top),mode(top)] )	:s(rdline)f(rl00)
+other	eq( level )                                        :s(rl00)
+	eq( processrec[result(top),mode(top)] )                :s(rdline)f(rl00)
 
 -stitl	tblini(str)pos,cnt,index,val,lastval
 *  this routine is called to initialize a table from a string of
@@ -748,7 +753,7 @@ tblini	pos     = 0
 *  size we need.
 *
 tin01   str     (tab(*pos) break('[') break(']') *?(cnt = cnt + 1) @pos)
-.	                              	:s(tin01)
+.                                                          :s(tin01)
 *
 *  allocate the table, and then fill it. note that a small memory
 *  optimisation is attempted here by trying to re-use the previous
@@ -756,11 +761,11 @@ tin01   str     (tab(*pos) break('[') break(']') *?(cnt = cnt + 1) @pos)
 *
 	tblini   = table(cnt)
 tin02   str     (break('[') $ index len(1) break(']') $ val len(1)) =
-.	                              	:f(return)
+.                                                          :f(return)
 	val     = convert( val,'integer' )
 	val     = ident(val,lastval) lastval
 	lastval = val
-	tblini[index] = val			:(tin02)
+	tblini[index] = val                                    :(tin02)
 -stitl generators
 *
 *  bsw processing begins by building an array that can hold all
@@ -770,9 +775,9 @@ g.bsw
 *  save prior vms code in case needed
 	ub = ( integer( op2 ) op2, equates[op2] )
 	iffar = integer( ub )
-.		array( '0:' ub - 1,'{{' )	:f(g.bsw1)
+.		array( '0:' ub - 1,'{{' )                          :f(g.bsw1)
 	dplbl = op3
-	bsw   = 1				:(dsgen)
+	bsw   = 1                                              :(dsgen)
 g.bsw1	error("non-integer lower bound for bsw")
 
 *
@@ -785,7 +790,7 @@ g.iff
 	iffval = ( integer( op1 ) op1, equates[op1] )
 	iffar[iffval] = integer( iffval )
 .		ifftyp ',' op1 '{' typ2 ',' op2 '{'  comment
-.						:s(dsout)
+.                                                          :s(dsout)
 	error("non-integer iff value")
 *
 *  in order to support translation of minimal operands and
@@ -794,16 +799,16 @@ g.iff
 *
 g.equ
 	equates[label] = ident(op1,'*')
-.			equ_defs[label]	:s(dsgen)
+.			equ_defs[label]                                :s(dsgen)
 
 	num1 = num2 = sym1 = sym2 = oprtr =
-	op1 p.equ.rip				:f(g.equ2)
+	op1 p.equ.rip                                          :f(g.equ2)
 	num1    = differ(sym1) equates[sym1]
 	num2    = differ(sym2) equates[sym2]
-	val     = (differ(oprtr) eval( num1 ' ' oprtr ' ' num2 ), num1)	:f(g.equ3)
-g.equ1	equates[label] = val				:(dsgen)
+	val     = (differ(oprtr) eval( num1 ' ' oprtr ' ' num2 ), num1):f(g.equ3)
+g.equ1	equates[label] = val                               :(dsgen)
 g.equ2	error("equ operand syntax error")
-g.equ3	error("equ evaluation failed: " num1 ' ' oprtr ' ' num2 ' "' op1 '"' )
+g.equ3	error("equ evaluation failed   " num1 ' ' oprtr ' ' num2 ' "' op1 '"' )
 *
 *  esw processing generates an iff for every value in the
 *  bsw range.
@@ -814,17 +819,17 @@ g.esw
 g.esw1	iffar[iffindx] break('{') $ val len(1)
 .		break( '{' ) $ plbl len(1)
 .		rem $ cmnt
-.						:f(g.esw2)
+.                                                          :f(g.esw2)
 	val = ident( val ) '1,' iffindx
 	plbl = ident( plbl ) '6,' dplbl
-	(ident(dplbl) ident(plbl) error("missing iff value: "
+	(ident(dplbl) ident(plbl) error("missing iff value : "
 .		 val " without plbl in preceding bsw"))
 	outstmt(,'iff',val,plbl,,cmnt)
-	iffindx = iffindx + 1			:(g.esw1)
-g.esw2  iffar =					:(dsgen)
+	iffindx = iffindx + 1                                  :(g.esw1)
+g.esw2  iffar =                                            :(dsgen)
 
 report
-	output = lpad(num,10) '  ' text		:(return)
+	output = lpad(num,10) '  ' text                        :(return)
 
 *  end prints statistics on terminal then exits program
 *
@@ -844,49 +849,49 @@ g.end
 *   here if procedures declared by inp but not by prc
 *   output = '  procedures with inp, no prc'
 
-    t = convert(prctab,'array')		       :f(g.end.2)
+    t = convert(prctab,'array')                            :f(g.end.2)
 
 	i = 1
-g.end.1 output = t[i,1] ' ' t[i,2]         :f(g.end.2)
-	i = i + 1				:(g.end.1)
+g.end.1 output = t[i,1] ' ' t[i,2]                         :f(g.end.2)
+	i = i + 1                                              :(g.end.1)
 g.end.2
-						:(end)
+                                                           :(end)
 g.ent
 
 *   note program entry labels
 
-	labtab[label] = 5			           :(dsgen)
-g.h						                   :(dsgen)
+	labtab[label] = 5                                      :(dsgen)
+g.h                                                        :(dsgen)
 
 *  keep track of sec statements
 
 g.sec
 
-    sectnow = sectnow + 1  		           :(dsgen)
+    sectnow = sectnow + 1                                  :(dsgen)
 
 g.ttl
-                                           :(dsout)
+                                                           :(dsout)
 	thisline len(10) rem . t
 	t span(' ') =
-	outstmt(,'ttl','27,' t)			       :(dsout)
+	outstmt(,'ttl','27,' t)                                :(dsout)
 
 g.erb
 g.err
 
     thisline break(',') len(1) rem . t
-	outstmt(label,opcode,op1, t)		   :(dsout)
+	outstmt(label,opcode,op1, t)                           :(dsout)
 
 g.inp
 
 	ident(label) error('no label for inp')
 	differ(t = prctab[label]) error('duplicate inp')
-	prctab[label] = op1			:(dsgen)
+	prctab[label] = op1                                    :(dsgen)
 
 g.prc
 
 	ident(label) error('no label for prc')
 	ident(t = prctab[label]) error('missing inp')
 	differ(t,op1) error('inconsistent inp/prc')
-	prctab[label] =				:(dsgen)
+	prctab[label] =                                        :(dsgen)
 
 end
