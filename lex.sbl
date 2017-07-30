@@ -831,49 +831,62 @@ report
 g.end
 	outstmt(,'end',,,,comment)
 	(ne(level) error("  unclosed if conditional clause"))
-        report(nlines,		'lines read')
-        report(nstmts, 		'statements processed')
-        report(ntarget, 	'target code lines produced')
-	report(&stcount, 	'spitbol statements executed')
-        differ(nerrors) report(nerrors,'errors detected')
+*   report(nlines,		'lines read')
+*   report(nstmts, 		'statements processed')
+*   report(ntarget, 	'target code lines produced')
+*   report(&stcount, 	'spitbol statements executed')
+    ne(nerrors) report(nerrors,'errors detected')
  	report =
 +	  differ(lasterror) '  the last error was in line ' lasterror
-	&code   = ne(nerrors) 2001
-        report(collect() * 5,	'free bytes')
+*   &code   = ne(nerrors) 2001
+*   report(collect() * 5,	'free bytes')
 
-	t = convert(prctab,'array')		:f(g.end.2)
-*  here if procedures declared by inp but not by prc
-        output = '  procedures with inp, no prc'
+*   here if procedures declared by inp but not by prc
+*   output = '  procedures with inp, no prc'
+
+    t = convert(prctab,'array')		       :f(g.end.2)
+
 	i = 1
-g.end.1 output = t[i,1] ' ' t[i,2]            :f(g.end.2)
+g.end.1 output = t[i,1] ' ' t[i,2]         :f(g.end.2)
 	i = i + 1				:(g.end.1)
 g.end.2
 						:(end)
 g.ent
-*  note program entry labels
-*	entfile = label ',' op1
-	labtab[label] = 5			:(dsgen)
-g.h						:(dsgen)
+
+*   note program entry labels
+
+	labtab[label] = 5			           :(dsgen)
+g.h						                   :(dsgen)
 
 *  keep track of sec statements
 
-g.sec	sectnow = sectnow + 1  		:(dsgen)
+g.sec
+
+    sectnow = sectnow + 1  		           :(dsgen)
+
 g.ttl
+                                           :(dsout)
 	thisline len(10) rem . t
 	t span(' ') =
-	outstmt(,'ttl','27,' t)			:(dsout)
+	outstmt(,'ttl','27,' t)			       :(dsout)
+
 g.erb
-g.err	thisline break(',') len(1) rem . t
-	outstmt(label,opcode,op1, t)		:(dsout)
+g.err
+
+    thisline break(',') len(1) rem . t
+	outstmt(label,opcode,op1, t)		   :(dsout)
 
 g.inp
+
 	ident(label) error('no label for inp')
 	differ(t = prctab[label]) error('duplicate inp')
 	prctab[label] = op1			:(dsgen)
 
 g.prc
+
 	ident(label) error('no label for prc')
 	ident(t = prctab[label]) error('missing inp')
 	differ(t,op1) error('inconsistent inp/prc')
 	prctab[label] =				:(dsgen)
+
 end
