@@ -115,11 +115,12 @@ run:
 			return
 		}
 		inst = mem[ip]
-        instCount = instCount + 1
-        if (instCount > instLimit) {
-            fmt.Println("too many instructions")
-            return;
-        }
+		instCount = instCount + 1
+		if instCount > instLimit {
+			fmt.Println("too many instructions", instCount, instLimit)
+			fmt.Println("too many instructions")
+			return
+		}
 
 		op = inst & op_m
 		dst = inst >> dst_ & dst_m
@@ -139,12 +140,12 @@ run:
 		ip++
 		switch op {
 		case stmt:
-            stmtCount = stmtCount + 1
-            if (stmtCount > stmtLimit) {
-            fmt.Println("too many statements")
-            return;
-        }
-                
+			stmtCount = stmtCount + 1
+			if stmtCount > stmtLimit {
+				fmt.Println(stmtCount, "too many statements", stmtCount, stmtLimit)
+				return
+			}
+
 			if strace {
 				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
