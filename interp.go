@@ -4,8 +4,7 @@ import (
 	//	"io"
 	"fmt"
 	"math"
-
-//	"unsafe"
+	//	"unsafe"
 )
 
 const (
@@ -86,7 +85,6 @@ var (
 )
 
 func interp() {
-//	instn := 0
 	var long1, long2 int64
 	//	var int1,int2 int32
 	var int1, int2 int32
@@ -94,7 +92,7 @@ func interp() {
 	var inst, dst, src, off int
 	var overflow bool
 	var op int
-//	var f1, f2 float32
+	//	var f1, f2 float32
 	var d1 float64
 
 	ip = start
@@ -117,13 +115,11 @@ run:
 			return
 		}
 		inst = mem[ip]
-/*
-		instn++
-		if instn > 150000 {
-			fmt.Println("instruction limit exceeded", instn)
-			return
-		}
-*/
+        instCount = instCount + 1
+        if (instCount > instLimit) {
+            fmt.Println("too many instructions")
+            return;
+        }
 
 		op = inst & op_m
 		dst = inst >> dst_ & dst_m
@@ -143,6 +139,12 @@ run:
 		ip++
 		switch op {
 		case stmt:
+            stmtCount = stmtCount + 1
+            if (stmtCount > stmtLimit) {
+            fmt.Println("too many statements")
+            return;
+        }
+                
 			if strace {
 				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
@@ -365,58 +367,58 @@ run:
 		case str:
 			reg[dst] = reg[ra]
 		case adr:
-//			f1 = math.Float32frombits(reg[ra])
-//			f2 = math.Float32frombits(reg[dst])
-//			reg[ra] = math.Float32bits(f1 + f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 + f2)
 		case sbr:
-//			f1 = math.Float32frombits(reg[ra])
-//			f2 = math.Float32frombits(reg[dst])
-//			reg[ra] = math.Float32bits(f1 - f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 - f2)
 		case mlr:
-//			f1 = math.Float32frombits(reg[ra])
-//			f2 = math.Float32frombits(reg[dst])
-//			reg[ra] = math.Float32bits(f1 * f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 * f2)
 		case dvr:
-//			f1 = math.Float32frombits(reg[ra])
-//			f2 = math.Float32frombits(reg[dst])
-//			reg[ra] = math.Float32bits(f1 / f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 / f2)
 		case rov:
-//			d1 = float64(math.Float32frombits(reg[ra]))
-//			if math.IsNaN(d1) || math.IsInf(d1, 0) {
-//				ip = off
-//			}
+			//			d1 = float64(math.Float32frombits(reg[ra]))
+			//			if math.IsNaN(d1) || math.IsInf(d1, 0) {
+			//				ip = off
+			//			}
 		case rno:
-//			d1 = float64(math.Float32frombits(reg[ra]))
-//			if !(math.IsNaN(d1) || math.IsInf(d1, 0)) {
-//				ip = off
-//			}
+			//			d1 = float64(math.Float32frombits(reg[ra]))
+			//			if !(math.IsNaN(d1) || math.IsInf(d1, 0)) {
+			//				ip = off
+			//			}
 		case ngr:
-//			f1 = math.Float32frombits(reg[ra])
-//			reg[ra] = math.Float32bits(-f1)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			reg[ra] = math.Float32bits(-f1)
 		case req:
-//			if math.Float32frombits(reg[ra]) == 0.0 {
-//				ip = off
-//			}
+			//			if math.Float32frombits(reg[ra]) == 0.0 {
+			//				ip = off
+			//			}
 		case rge:
-//			if math.Float32frombits(reg[ra]) >= 0.0 {
-//				ip = off
-//			}
+			//			if math.Float32frombits(reg[ra]) >= 0.0 {
+			//				ip = off
+			//			}
 		case rgt:
-//			if math.Float32frombits(reg[ra]) < 0.0 {
-//				ip = off
-//			}
+			//			if math.Float32frombits(reg[ra]) < 0.0 {
+			//				ip = off
+			//			}
 		case rle:
-//			if math.Float32frombits(reg[ra]) <= 0.0 {
-//				ip = off
-//			}
+			//			if math.Float32frombits(reg[ra]) <= 0.0 {
+			//				ip = off
+			//			}
 		case rlt:
-//			if math.Float32frombits(reg[ra]) < 0.0 {
-//				ip = off
-//			}
+			//			if math.Float32frombits(reg[ra]) < 0.0 {
+			//				ip = off
+			//			}
 		case rne:
-//			if math.Float32frombits(reg[ra]) != 0.0 {
-//				ip = off
-//			}
+			//			if math.Float32frombits(reg[ra]) != 0.0 {
+			//				ip = off
+			//			}
 		case plc:
 			reg[dst] = reg[dst] + reg[src] + 2
 		case psc:
@@ -473,12 +475,12 @@ run:
 				ip = off
 			}
 		case itr:
-//			reg[ia] = math.Float32bits(float32(int32(reg[ia])))
+			//			reg[ia] = math.Float32bits(float32(int32(reg[ia])))
 		case rti:
-//			d1 = float64(math.Float32frombits(reg[ra]))
-//			if math.IsNaN(d1) || math.IsInf(d1, 0) {
-//				ip = off
-//			}
+			//			d1 = float64(math.Float32frombits(reg[ra]))
+			//			if math.IsNaN(d1) || math.IsInf(d1, 0) {
+			//				ip = off
+			//			}
 			reg[ia] = int(int32(d1))
 		case ctb, ctw:
 			reg[dst] += off
