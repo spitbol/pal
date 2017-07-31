@@ -10,4 +10,4 @@ defined by Minimal.
 
 The runtime for TBOL is written in the Go language. Since Go is available on a wide
 variety of machines, TBOL provides a way to port SPITBOL to these machines with
-minimal effort.
+minimal effort. 
