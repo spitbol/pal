@@ -4,8 +4,7 @@ import (
 	//	"io"
 	"fmt"
 	"math"
-
-//	"unsafe"
+	//	"unsafe"
 )
 
 const (
@@ -86,22 +85,22 @@ var (
 )
 
 func interp() {
-//	instn := 0
-	var long1, long2 int64
-	//	var int1,int2 int64
-	var int1, int2 int64
+	//	instn := 0
+	var long1, long2 int32
+	//	var int1,int2 int32
+	var int1, int2 int32
 	var prcstack [64]int
 	var inst, dst, src, off int
 	var overflow bool
 	var op int
-	var f1, f2 float64
-	var d1 float64
+//	var f1, f2 float32
+//	var d1 float32
 
 	ip = start
 	/*
 				fmt.Printf(" startup r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
-					 reg[cp],int64(reg[ia]))
+					 reg[cp],int32(reg[ia]))
 		fmt.Printf("start interp mem len %v  ip %v r0 %v\n",len(mem),ip,reg[r0])
 		fmt.Printf("s_aaa %v s_yyy %v\n",s_aaa,s_yyy)
 	*/
@@ -117,13 +116,13 @@ run:
 			return
 		}
 		inst = mem[ip]
-/*
-		instn++
-		if instn > 150000 {
-			fmt.Println("instruction limit exceeded", instn)
-			return
-		}
-*/
+		/*
+			instn++
+			if instn > 150000 {
+				fmt.Println("instruction limit exceeded", instn)
+				return
+			}
+		*/
 
 		op = inst & op_m
 		dst = inst >> dst_ & dst_m
@@ -132,7 +131,7 @@ run:
 		if itrace {
 			fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
-				reg[cp], int64(reg[ia]))
+				reg[cp], int32(reg[ia]))
 			fmt.Printf(" %v %v %v %v %v %v\n", ip,
 				op, opName[op], regName[dst], regName[src], off)
 
@@ -146,7 +145,7 @@ run:
 			if strace {
 				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
 					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
-					reg[xl], reg[xr], reg[xs], reg[cp], int64(reg[ia]))
+					reg[xl], reg[xr], reg[xs], reg[cp], int32(reg[ia]))
 				fmt.Printf("  %v\n", stmt_text[off])
 			}
 		case mov:
@@ -249,7 +248,7 @@ run:
 				ip = off
 			}
 		case aov:
-			if int(reg[dst])+int(reg[src]) > math.MaxUint64 {
+			if int(reg[dst])+int(reg[src]) > math.MaxUint32 {
 				ip = off
 			}
 			reg[dst] += reg[src]
@@ -274,27 +273,27 @@ run:
 			reg[ia] = reg[dst]
 		//TODO: Reminder that ia is SIGNED integer when doing arithmetic
 		case adi:
-			long1, long2 = int64(int64(reg[ia])), int64(int64(reg[dst]))
+			long1, long2 = int32(int32(reg[ia])), int32(int32(reg[dst]))
 			long1 += long2
-			if long1 > math.MaxInt64 || long1 < math.MinInt64 {
+			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				overflow = true
 			} else {
 				overflow = false
 				reg[ia] = int(long1)
 			}
 		case mli:
-			long1, long2 = int64(int64(reg[ia])), int64(int64(reg[dst]))
+			long1, long2 = int32(int32(reg[ia])), int32(int32(reg[dst]))
 			long1 *= long2
-			if long1 > math.MaxInt64 || long1 < math.MinInt64 {
+			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				overflow = true
 			} else {
 				overflow = false
 				reg[ia] = int(long1)
 			}
 		case sbi:
-			long1, long2 = int64(int64(reg[ia])), int64(int64(reg[dst]))
+			long1, long2 = int32(int32(reg[ia])), int32(int32(reg[dst]))
 			long1 -= long2
-			if long1 > math.MaxInt64 || long1 < math.MinInt64 {
+			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				overflow = true
 			} else {
 				overflow = false
@@ -305,7 +304,7 @@ run:
 				overflow = true
 			} else {
 				overflow = false
-				int1, int2 = int64(reg[ia]), int64(reg[dst])
+				int1, int2 = int32(reg[ia]), int32(reg[dst])
 				int1 /= int2
 				reg[ia] = int(int1)
 			}
@@ -314,15 +313,15 @@ run:
 				overflow = true
 			} else {
 				overflow = false
-				int1, int2 = int64(reg[ia]), int64(reg[dst])
+				int1, int2 = int32(reg[ia]), int32(reg[dst])
 				int1 %= int2
 				reg[ia] = int(int1)
 			}
 			//		case sti:
 			//			reg[dst] = reg[ia]
 		case ngi:
-			int1 = int64(reg[ia])
-			if int1 == math.MinInt64 {
+			int1 = int32(reg[ia])
+			if int1 == math.MinInt32 {
 				overflow = true
 			} else {
 				overflow = false
@@ -337,23 +336,23 @@ run:
 				ip = off
 			}
 		case ieq:
-			if int64(reg[ia]) == 0 {
+			if int32(reg[ia]) == 0 {
 				ip = off
 			}
 		case ige:
-			if int64(reg[ia]) >= 0 {
+			if int32(reg[ia]) >= 0 {
 				ip = off
 			}
 		case igt:
-			if int64(reg[ia]) > 0 {
+			if int32(reg[ia]) > 0 {
 				ip = off
 			}
 		case ile:
-			if int64(reg[ia]) <= 0 {
+			if int32(reg[ia]) <= 0 {
 				ip = off
 			}
 		case ilt:
-			if int64(reg[ia]) < 0 {
+			if int32(reg[ia]) < 0 {
 				ip = off
 			}
 		case ine:
@@ -365,58 +364,58 @@ run:
 		case str:
 			reg[dst] = reg[ra]
 		case adr:
-			f1 = math.Float64frombits(reg[ra])
-			f2 = math.Float64frombits(reg[dst])
-			reg[ra] = math.Float64bits(f1 + f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 + f2)
 		case sbr:
-			f1 = math.Float64frombits(reg[ra])
-			f2 = math.Float64frombits(reg[dst])
-			reg[ra] = math.Float64bits(f1 - f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 - f2)
 		case mlr:
-			f1 = math.Float64frombits(reg[ra])
-			f2 = math.Float64frombits(reg[dst])
-			reg[ra] = math.Float64bits(f1 * f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 * f2)
 		case dvr:
-			f1 = math.Float64frombits(reg[ra])
-			f2 = math.Float64frombits(reg[dst])
-			reg[ra] = math.Float64bits(f1 / f2)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			f2 = math.Float32frombits(reg[dst])
+			//			reg[ra] = math.Float32bits(f1 / f2)
 		case rov:
-			d1 = float64(math.Float64frombits(reg[ra]))
-			if math.IsNaN(d1) || math.IsInf(d1, 0) {
-				ip = off
-			}
+			//			d1 = float32(math.Float32frombits(reg[ra]))
+			//			if math.IsNaN(d1) || math.IsInf(d1, 0) {
+			//				ip = off
+			//			}
 		case rno:
-			d1 = float64(math.Float64frombits(reg[ra]))
-			if !(math.IsNaN(d1) || math.IsInf(d1, 0)) {
-				ip = off
-			}
+			//			d1 = float32(math.Float32frombits(reg[ra]))
+			//			if !(math.IsNaN(d1) || math.IsInf(d1, 0)) {
+			//				ip = off
+			//			}
 		case ngr:
-			f1 = math.Float64frombits(reg[ra])
-			reg[ra] = math.Float64bits(-f1)
+			//			f1 = math.Float32frombits(reg[ra])
+			//			reg[ra] = math.Float32bits(-f1)
 		case req:
-			if math.Float64frombits(reg[ra]) == 0.0 {
-				ip = off
-			}
+			//			if math.Float32frombits(reg[ra]) == 0.0 {
+			//				ip = off
+			//			}
 		case rge:
-			if math.Float64frombits(reg[ra]) >= 0.0 {
-				ip = off
-			}
+			//			if math.Float32frombits(reg[ra]) >= 0.0 {
+			//				ip = off
+			//			}
 		case rgt:
-			if math.Float64frombits(reg[ra]) < 0.0 {
-				ip = off
-			}
+			//			if math.Float32frombits(reg[ra]) < 0.0 {
+			//				ip = off
+			//			}
 		case rle:
-			if math.Float64frombits(reg[ra]) <= 0.0 {
-				ip = off
-			}
+			//			if math.Float32frombits(reg[ra]) <= 0.0 {
+			//				ip = off
+			//			}
 		case rlt:
-			if math.Float64frombits(reg[ra]) < 0.0 {
-				ip = off
-			}
+			//			if math.Float32frombits(reg[ra]) < 0.0 {
+			//				ip = off
+			//			}
 		case rne:
-			if math.Float64frombits(reg[ra]) != 0.0 {
-				ip = off
-			}
+			//			if math.Float32frombits(reg[ra]) != 0.0 {
+			//				ip = off
+			//			}
 		case plc:
 			reg[dst] = reg[dst] + reg[src] + 2
 		case psc:
@@ -457,9 +456,9 @@ run:
 		case xob:
 			reg[dst] ^= reg[src]
 		case rsh:
-			reg[dst] = reg[dst] >> off
+//			reg[dst] = reg[dst] >> off
 		case lsh:
-			reg[dst] = reg[dst] << off
+//			reg[dst] = reg[dst] << off
 		case nzb:
 			if reg[dst] != 0 {
 				ip = off
@@ -469,27 +468,27 @@ run:
 				ip = off
 			}
 		case mfi:
-			if off != 0 && int64(reg[ia]) < 0 {
+			if off != 0 && int32(reg[ia]) < 0 {
 				ip = off
 			}
 		case itr:
-			reg[ia] = math.Float64bits(float64(int64(reg[ia])))
+			//reg[ia] = math.Float32bits(float32(int32(reg[ia])))
 		case rti:
-			d1 = float64(math.Float64frombits(reg[ra]))
-			if math.IsNaN(d1) || math.IsInf(d1, 0) {
-				ip = off
-			}
-			reg[ia] = int(int64(d1))
+		//d1 = float32(math.Float32frombits(reg[ra]))
+		//if math.IsNaN(d1) || math.IsInf(d1, 0) {
+		//		ip = off
+		//	}
+		//	reg[ia] = int(int32(d1))
 		case ctb, ctw:
 			reg[dst] += off
 		case cvm:
-			long1 = int64(int64(reg[ia]))*10 - int64(reg[wb]-'0')
-			if long1 > math.MaxInt64 || long1 < math.MinInt64 {
+			long1 = int32(int32(reg[ia]))*10 - int32(reg[wb]-'0')
+			if long1 > math.MaxInt32 || long1 < math.MinInt32 {
 				ip = off
 			}
 			reg[ia] = int(long1)
 		case cvd:
-			int1 = int64(reg[ia])
+			int1 = int32(reg[ia])
 			reg[ia] = int(int1 / 10)
 			reg[wa] = int(-(int1 % 10) + '0')
 		case mvc, mvw:
@@ -532,7 +531,7 @@ run:
 			}
 			/*
 				case decv:
-					int1 = int64(reg[ia])
+					int1 = int32(reg[ia])
 					reg[ia] = int(reg[ia] / 10)
 					int1 = int1 % 10
 					reg[ia] = int(-int1 + 0x30)

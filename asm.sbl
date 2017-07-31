@@ -156,7 +156,7 @@ finish.end.labels
 
 *   write out any real constants that need to be patched into the program text
 
-    putline('reals = map[int] float64 {')
+    putline('reals = map[int] float32 {')
     drcara = sort(drctab,1)
     i = 0
 
@@ -241,7 +241,7 @@ finish.end.prc_names
 
     n = prc_ara<i = i + 1,1>                            :f(finish.end.prc_names.1)
     nam = prc_ara<i,2>
-    putline(tab     +n tab  ' ' tab '"' nam '",')
+    putline(tab     +n ' : ' tab '"' nam '",')
                                                         :(finish.end.prc_names)
 finish.end.prc_names.1
 
@@ -1221,12 +1221,12 @@ init
 
     fileprefix = "s"
 
-*       1 is bytes per word, 1 is characters per word
-*       these should agree with values used in translator
+*   1 is bytes per word, 1 is characters per word
+*   these should agree with values used in translator
 *   set target-dependent configuration parameters
 
-    hdr = 'i64'
-*       op_w is instruction suffix for word-size
+*   op_w is instruction suffix for word-size
+
     op_w = ''
 *       op_c is instruction suffix for minimal character size
     op_c = ''
@@ -1237,17 +1237,17 @@ init
 
     sectnow = 0
 
-*       ppm_cases gives count of ppm/err statments that must follow call to a procedure
+*   ppm_cases gives count of ppm/err statments that must follow call to a procedure
 
     ppm_cases = table(50,,0)
 
-*       prc_names maps program_counter values to name of program entry point
+*   prc_names maps program_counter values to name of program entry point
 
     prc_names = table(100)
 
     error_messages = table(200)
 
-*       is_exec identifies the executable minimal statements
+*   is_exec identifies the executable minimal statements
 
     is_exec = setini(
 .       'flc add adi adr anb aov atn '
