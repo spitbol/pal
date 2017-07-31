@@ -932,15 +932,14 @@ g.end
 
     outstmt(,'end',,,,comment)
     (ne(level) error("  unclosed if conditional clause"))
-        report(nlines,      'lines read')
-        report(nstmts,      'statements processed')
-        report(ntarget,     'target code lines produced')
-    report(&stcount,    'spitbol statements executed')
-        differ(nerrors) report(nerrors,'errors detected')
+*   report(nlines,      'lines read')
+*   report(nstmts,      'statements processed')
+*   report(ntarget,     'target code lines produced')
+*   report(&stcount,    'spitbol statements executed')
+    ne(nerrors) report(nerrors,'errors detected')
     report =
 +     differ(lasterror) '  the last error was in line ' lasterror
     &code   = ne(nerrors) 2001
-        report(collect() * 5,   'free bytes')
 
     t = convert(prctab,'array')                         :f(g.end.2)
 *   here if procedures declared by inp but not by prc
