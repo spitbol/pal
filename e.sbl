@@ -1,1 +1,5 @@
+loop
+
+	lt(i = i + 1,500000) :s(loop)
+	output = i
 end

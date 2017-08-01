@@ -11,8 +11,8 @@ var ifileName string
 
 var instCount = 0      // number of instructions executed
 var stmtCount = 0      // number of statements executed (stmt opcode)
-var instLimit = 100000 // maximum number of instructions
-var stmtLimit = 100000   // maximum number of statements
+var instLimit = 100000000 // maximum number of instructions
+var stmtLimit = 100000000   // maximum number of statements
 
 func main() {
 	flag.BoolVar(&itrace, "it", false, "intstruction trace")
