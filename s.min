@@ -4867,8 +4867,8 @@ lstms  dac  b_scl            page
 *      listing header message
 
 headr  dac  b_scl
-       dac  27
-       dtc  /macro spitbol version 15.01/
+       dac  25
+       dtc  /macro spitbol version 4.0/
 
 headv  dac  b_scl            for exit() version no. check
        dac  5

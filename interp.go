@@ -7,93 +7,7 @@ import (
 	//	"unsafe"
 )
 
-const (
-	r0 = iota
-	r1
-	r2
-	wa
-	wb
-	wc
-	xl
-	xr
-	xs
-	ia
-	ra
-	cp
-)
-const (
-	xt = xs
-)
-
-var regName = map[int]string{
-	r0: "r0",
-	r1: "r1",
-	r2: "r2",
-	wa: "wa",
-	wb: "wb",
-	wc: "wc",
-	xl: "xl",
-	xr: "xr",
-	xs: "xs",
-	ia: "ia",
-	ra: "ra",
-	cp: "cp",
-}
-
-/*
-const (
-	atn = iota
-	chp
-	cos
-	etx
-	lnf
-	sin
-	sqr
-	tan
-)
-*/
-/*	operation encoded in four parts:
-	_w	gives width in bits
-	_m	gives mask to extract value
-	operand encod
-*/
-const (
-	op_w  = 8
-	dst_w = 4
-	src_w = 4
-	off_w = 16
-	op_m  = 1<<op_w - 1
-	dst_m = 1<<dst_w - 1
-	src_m = 1<<src_w - 1
-	off_m = 1<<off_w - 1
-	op_   = 0
-	dst_  = op_ + op_w
-	src_  = dst_ + dst_w
-	off_  = src_ + src_w
-)
-
-const (
-	stackLength = 1000
-)
-
-var (
-	ip       int
-	mem      [100000]int
-	reg      [16]int
-	stackEnd int
-	memLast  int // index of last allocated memory word
-)
-
 func interp() {
-	var long1, long2 int64
-	//	var int1,int2 int32
-	var int1, int2 int32
-	var prcstack [32]int
-	var inst, dst, src, off int
-	var overflow bool
-	var op int
-	//	var f1, f2 float32
-	var d1 float64
 
 	ip = start
 	/*
@@ -126,17 +40,14 @@ run:
 		dst = inst >> dst_ & dst_m
 		src = inst >> src_ & src_m
 		off = inst >> off_ & off_m
-		if itrace {
-			fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
-				reg[r1], reg[r2], reg[wa], reg[wb], reg[wc], reg[xl], reg[xr], reg[xs],
-				reg[cp], int32(reg[ia]))
-			fmt.Printf(" %v %v %v %v %v %v\n", ip,
-				op, opName[op], regName[dst], regName[src], off)
-
+		if off > maxOffset && off > 122000 {
+			maxOffset = off
+			fmt.Println("new maxOffset", maxOffset)
+			listStmt()
 		}
-		//		fmt.Printf(" %v %v %v %v=%v %v=%v %v\n", ip,
-		//		op, opName[op], regName[dst], reg[dst],
-		//		regName[src], reg[src], off)
+		if instTrace {
+			listStmt()
+		}
 		ip++
 		switch op {
 		case stmt:
@@ -146,12 +57,11 @@ run:
 				return
 			}
 
-			if strace {
-				fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
-					reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
-					reg[xl], reg[xr], reg[xs], reg[cp], int32(reg[ia]))
-				fmt.Printf("  %v\n", stmt_text[off])
-			}
+			/*
+				if stmtTrace {
+					listStmt()
+				}
+			*/
 		case mov:
 			reg[dst] = reg[src]
 		case brn:
@@ -622,104 +532,13 @@ func startup() int {
 	return 0
 }
 
-var opName = map[int]string{
-	add:     "add",
-	adi:     "adi",
-	adr:     "adr",
-	anb:     "anb",
-	aov:     "aov",
-	bct:     "bct",
-	beq:     "beq",
-	bev:     "bev",
-	bge:     "bge",
-	bgt:     "bgt",
-	bhi:     "bhi",
-	ble:     "ble",
-	blo:     "blo",
-	blt:     "blt",
-	bne:     "bne",
-	bnz:     "bnz",
-	bod:     "bod",
-	bri:     "bri",
-	brn:     "brn",
-	bsw:     "bsw",
-	bze:     "bze",
-	call:    "call",
-	chk:     "chk",
-	cmc:     "cmc",
-	cne:     "cne",
-	cvd:     "cvd",
-	cvm:     "cvm",
-	dca:     "dca",
-	dcv:     "dcv",
-	dvi:     "dvi",
-	dvr:     "dvr",
-	erb:     "erb",
-	err:     "err",
-	exi:     "exi",
-	flc:     "flc",
-	ica:     "ica",
-	icp:     "icp",
-	icv:     "icv",
-	ieq:     "ieq",
-	ige:     "ige",
-	igt:     "igt",
-	ile:     "ile",
-	ilt:     "ilt",
-	ine:     "ine",
-	ino:     "ino",
-	iov:     "iov",
-	itr:     "itr",
-	jsrerr:  "jsrerr",
-	lcp:     "lcp",
-	lcw:     "lcw",
-	ldi:     "ldi",
-	ldr:     "ldr",
-	lei:     "lei",
-	load:    "load",
-	loadcfp: "loadcfp",
-	loadi:   "loadi",
-	lsh:     "lsh",
-	mfi:     "mfi",
-	mli:     "mli",
-	mlr:     "mlr",
-	mov:     "mov",
-	move:    "move",
-	mvc:     "mvc",
-	mvw:     "mvw",
-	mwb:     "mwb",
-	ngi:     "ngi",
-	ngr:     "ngr",
-	nzb:     "nzb",
-	orb:     "orb",
-	plc:     "plc",
-	pop:     "pop",
-	popr:    "popr",
-	ppm:     "ppm",
-	prc:     "prc",
-	psc:     "psc",
-	push:    "push",
-	pushi:   "pushi",
-	pushr:   "pushr",
-	realop:  "realop",
-	req:     "req",
-	rge:     "rge",
-	rgt:     "rgt",
-	rle:     "rle",
-	rlt:     "rlt",
-	rmi:     "rmi",
-	rne:     "rne",
-	rno:     "rno",
-	rov:     "rov",
-	rsh:     "rsh",
-	rti:     "rti",
-	sbi:     "sbi",
-	sbr:     "sbr",
-	scp:     "scp",
-	store:   "store",
-	sub:     "sub",
-	sys:     "sys",
-	trc:     "trc",
-	xob:     "xob",
-	zrb:     "zrb",
+func listStmt() {
+
+	fmt.Println()
+	fmt.Printf(" r1 %v r2 %v wa %v wb %v wc %v xl %v xr %v xs %v cp %v ia %v\n",
+		reg[r1], reg[r2], reg[wa], reg[wb], reg[wc],
+		reg[xl], reg[xr], reg[xs], reg[cp], int32(reg[ia]))
+	fmt.Printf(" %v %v %v %v %v %v\n", ip,
+		op, opName[op], regName[dst], regName[src], off)
+	fmt.Printf("  %v\n", stmt_text[off])
 }
