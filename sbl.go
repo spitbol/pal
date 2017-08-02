@@ -198,8 +198,8 @@ instCount = 0      // number of instructions executed
 stmtCount = 0      // number of statements executed (stmt opcode)
 instLimit = 100000000 // maximum number of instructions
 stmtLimit = 100000000   // maximum number of statements
-stmtTrace = true
-instTrace = true
+stmtTrace = false
+instTrace = false
 maxOffset = 0
 )
 
