@@ -508,19 +508,17 @@ run:
 
 func startup() int {
 	//	var memMinimum int = len(program) + 3 * (maxreclen + 2) + stackLength
-	for i := 0; i < len(program); i++ {
-		mem[i] = program[i]
-		//		fmt.Printf("mem %v %x\n",i,mem[i])
-	}
-	memLast = int(len(program)) + 10
+	copy(mem[:], program)
+
+	memLast = len(program) + 10
 	// scblk is just four words, sufficient to hold null string
 	scblk0 = memLast
 	scblk1 = memLast + 4
 	scblk2 = scblk1 + maxreclen + 1
 	memLast += maxreclen + 1
-	stackEnd = int(memLast)
+	stackEnd = memLast
 	memLast += stackLength
-	stackStart := int(memLast)
+	stackStart := memLast
 	memLast += 10
 	reg[xl] = memLast // start data area
 	// allocate 10000 words for initial data area
