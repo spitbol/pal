@@ -96,7 +96,7 @@ A simple test can be done with
 As of this writing in early August 2017 only a very small part of OSINT has been implemented,
 just enough to run programs and write to standard output.
 
-Simple programs have shown that a least simple loops and some of the SPITBOL
+Testing has shown that at least simple loops and some of the SPITBOL
 primitives such as DUPL are working, as is the garbage collector.
 
 SPITBOL includes a mark-sweep, compacting garbage collector with "sediments," by which
