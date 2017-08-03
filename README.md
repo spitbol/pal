@@ -112,17 +112,17 @@ of the use of Go as an assembler.
 
 File S.GO contains, in order, the following definitions and declarations:
 
-*   _const_ declaration of the opcodes.
-*   _const_ declaration of the configuration parameters CFP_*;
-*    definitions of symbolic variables define using EQU instructions;
-*    _program_, an array of ints containing the initial memory content;
-*    _const_, declaration giving the values of the symbolic variable values
+-   _const_ declaration of the opcodes.
+-   _const_ declaration of the configuration parameters; 
+-   _const_ with  definitions of symbolic variables define using EQU instructions;
+-    _program_, an array of ints containing the initial memory content;
+-    _const_, declaration giving the values of the symbolic variable values
 and the offsets of program labels;
-*    _const_, declaration mapping names of OSINT procedures to integer values;
-*    _error_messages_, a map from error numbers to error message text;
-*    _prc_names_, a map from line numbers to the name of the Minimal procedure
+-    _const_, declaration mapping names of OSINT procedures to integer values;
+-    _errorMessages_, a map from error numbers to error message text;
+-    _prcNames_, a map from line numbers to the name of the Minimal procedure
          defined at that line number in the Minimal source; and
-*    _stmt_text_, a map from line numbers to the text of the associated Minimal instruction.
+-    _stmtText_, a map from line numbers to the text of the associated Minimal instruction.
 
 The file S.GO contains about 36,500 lines.
 
@@ -137,46 +137,42 @@ a sense of just how good GO is an handling initializers.
 
 ## Back to the Past with Rob Pike
 
-I first met Rob Pike over 35 years ago. Rob had just joined Bell Labs after getting
-his M.S. in Physics from Caltech (I had gotten a BS.S. in math about fifteen years earlier),
-and competing in the 1980 Olympics as a member of the Canadian archery team. (1)
+My success using Go as an assembler brought to mind another encounter, by a now
+prominent Gopher, with an actual assembler that didn't go so well.
 
-Doug McIlroy was a friend of Jack Shwartz of the Courant Institute of Mathematical Sciences
-(CIMS) at New York University. I had then been working for a decade on the imlementation of SETL (SET Language), a programming languaged with finite sets as the fundamental datatype.
+Here's the story, from those long ago days when most programmers actually knew assembly language.
 
-I had spend most of my time on the SETL project implementing and porting  LITTLE,
-a lower-level language created by Jack with the partial-world field as the basic datatype.
-(Our work was done on the CDC 66000, which had 60-bit words, was word-addressable,
-and only one megabyte of main memory, so partial-word operations were important.)
+I first met Rob Pike over 35 years ago, soon after he had joined Bell Labs.
 
-A few years earlier, I had spent a couple of weeks in Leeds, England, workkng with Anthony (Tony)
-McCann ofiii Leeds Universitry. Tony and Robert B. K. Dewar were the co-authors of Macro SPITBOL.
-After that visit I decided to see if LITTLE could more easily be ported by generating code
-in the same way as SPITBOL, first by using T10 to port LITTLE to the DEC-10, and then T32
-to port LITTLE to the VAX 11/780.
+SETL (SET Language), a language based on the theory of finite sets,  was created by
+Prof. Jack Schwartz of the Courant Institute of Mathematical Sciences (CIMS)
+of New York University.
 
+SETL was implemented using LITTLE, a low-level language also created by Jack.
+My main role in the SETL project was the implementation of LITTLE and porting
+it to new machines so we could port SETL.
+
+Doug McIlroy, head of the department at Bell Labs that created Unix, was a friend of Jack. 
 Doug thought the folks at BTL might be interested in SETL, and so asked Rob to work with
-me to port LITTLE (and hence SETL) to the VAX using BTL's Unix 32V.
+me to port LITTLE, and hence SETL, to the Dec VAX using BTL's Unix 32V.
 
-I cut a tape and went off to BTL, explained how the system worked, and Rob took it from
+Though the first two implementations of LITTLE (CDC 6600, IBM/360) generated object files, LITTLE
+was then ported by generating source assembly-like code for an abstract machine
+close to the target architecture.  This approach was based on that used by Macro SPITBOL.
+
+I cut a tape and went off to BTL, explained to Rob how the system worked, and Rob took it from
 there.
 
 The port was not easy, to say the least, as Rob did battle with the Unix assembler, as.
 It seems likely that SETL in T32 was the largest file thrown at as until that time, and
-Rob broke it many times over.
+Rob broke as many times over.
 
 Rob did eventually finish the port, and produced a wonderful report about his experiences.
+(I think I have a copy somewhere and will publish it if I can find it. It's a fun read.)
+
+So Rob tamed the assembler that was needed back then, and several decades later helped create a language
+so well designed and implemented that it can be used as an assembler.
+
+Job Well Done.
+
 (I think I have a copy somehwhere and will publish it if I can locate it, as it is a very fun read.)
-
-A couple of years later Rob invited to visit him at Bell Labs to see his "BLIT" terminal.
-I thought it a clear technical breakthrough in showing what was possible with a display
-terminal. It was far ahead of its time, and it's a shame Bell was never able to bring it to market.
-
-I was so impressed I arranged a demo at CIMS, so Rob could show it folks from CIMS,
-Columbia, and Rpckefeller University.
-
-Though Go in impressive, I still consider the BLIT to be his greatest accomplishment.
-
-
-(1) I later remembered there were no Olympic Games in 1980,
-though it took me a while to realize that Rob was spoofing me.
