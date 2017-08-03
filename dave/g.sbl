@@ -1,6 +1,0 @@
-loop
-
-	lt(i = i + 1,5) :s(loop)
-	output = i
-    collect()
-end
