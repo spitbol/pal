@@ -133,9 +133,9 @@ That the Go compiler is able to compile the file is an impressive feat,
 and we here wish to thank the Gophers who made this possible by all their hard work.
 
 
-## GO.INIT
+## GO.DEMO
 
-The repository contains the file GO.INIT, a copy of S.GO, included so you an get
+The repository contains the file GO.DEMO, a copy of S.GO, included so you an get
 a sense of just how good GO is an handling initializers.
 
 ## Back to the Past with Rob Pike
