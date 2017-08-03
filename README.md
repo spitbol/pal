@@ -6,7 +6,7 @@ operating environment without having to produce machine code for the processor a
 
 
 This is done by generating code for MAM (Minimal Abstract Machine),
-an abstract machine with a RISK-like architecture.
+an abstract machine with a RISC-like architecture.
 
 Runtime support for SPITBOL is provided by OSINT (Operating System INTerface).
 The standard OSINT used to port SPITBOL is written in C, and contains just over
@@ -27,11 +27,15 @@ by a version using Unicode.
 
 MAM has the following registers defined by Minimal::
 
+```
  wa wb wc xl xr xs ia ra cp
+```
 
 as well as three work registers:
 
+```
 	r0 r1 r2
+```
 
 Register r0 is always zero.
 
@@ -69,7 +73,7 @@ To try the system, do
     $ cd $GOPATH
     $ go get github.com/spitbol/tbol
     $ cd $GOPATH/src/github.com/spitbol/tbol
-``
+```
 
 The translation is done with the commands:
 
@@ -103,12 +107,8 @@ of Minimal code, of which 250 lines are comments.
 
 ## Using Go as an assembler
 
-
-This is sample output from translating the Minimal code for SPITBOL to the declarations
-and variables needed to effect interpreation of the abstract target machine MAM.
-
-Compiling the file is both a stress-test for how Go handles initializers and a demonstration
-of the use of Go as an assembler.
+The file S.GO contains Go source code defining the constants and variables representing the
+code for the MAM machine.
 
 File S.GO contains, in order, the following definitions and declarations:
 
@@ -124,9 +124,12 @@ and the offsets of program labels;
          defined at that line number in the Minimal source; and
 -    _stmtText_, a map from line numbers to the text of the associated Minimal instruction.
 
-The file S.GO contains about 36,500 lines.
+The file contains about 36,500 lines.
 
-That the Go compiler is able to compile the file is an impressive feat
+Compiling this file is both a stress-test for how Go handles initializers and a demonstration
+of the use of Go as an assembler.
+
+That the Go compiler is able to compile the file is an impressive feat,
 and we here wish to thank the Gophers who made this possible by all their hard work.
 
 
@@ -137,7 +140,7 @@ a sense of just how good GO is an handling initializers.
 
 ## Back to the Past with Rob Pike
 
-My success using Go as an assembler brought to mind another encounter, by a now
+The success using Go as an assembler brought to mind another encounter, by a now
 prominent Gopher, with an actual assembler that didn't go so well.
 
 Here's the story, from those long ago days when most programmers actually knew assembly language.
@@ -163,16 +166,15 @@ close to the target architecture.  This approach was based on that used by Macro
 I cut a tape and went off to BTL, explained to Rob how the system worked, and Rob took it from
 there.
 
-The port was not easy, to say the least, as Rob did battle with the Unix assembler, as.
-It seems likely that SETL in T32 was the largest file thrown at as until that time, and
-Rob broke as many times over.
+The port was not easy, to say the least, as Rob did battle with the Unix assembler, `as`.
+It seems likely that SETL in T32 was the largest file thrown at `as` until that time, and
+Rob broke the assembler many times over, having to fix it every time.
 
 Rob did eventually finish the port, and produced a wonderful report about his experiences.
 (I think I have a copy somewhere and will publish it if I can find it. It's a fun read.)
 
-So Rob tamed the assembler that was needed back then, and several decades later helped create a language
+So Rob tamed the assembler that was needed back then, and --  several decades later -- helped create a language
 so well designed and implemented that it can be used as an assembler.
 
 Job Well Done.
 
-(I think I have a copy somehwhere and will publish it if I can locate it, as it is a very fun read.)
